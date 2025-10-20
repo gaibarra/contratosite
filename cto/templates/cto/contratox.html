@@ -1,0 +1,1089 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% load formatags %}
+
+
+ {% block top_bar %}
+   <div class="page-title-bar">
+     <div class="page-title"><i class="fas fa-file-signature"></i> {{ enc.status }} — Contrato</div>
+     <div class="page-sub">
+       <span class="chip"><i class="fas fa-user"></i> {{ user.username }} {{ user.last_name }} {{ user.first_name }}</span>
+       {% if secuencia_data %}<span class="chip"><i class="fas fa-hashtag"></i> {{ secuencia_data }}</span>{% endif %}
+       {% if enc.id %}<span class="chip"><i class="fas fa-id-card"></i> Folio {{ enc.id }}</span>{% endif %}
+     </div>
+   </div>
+ {% endblock top_bar %}
+
+{% block page_content %}
+
+<form method="post" enctype="multipart/form-data" id="frmSolicitudes"  >
+    {% csrf_token %}    
+
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+      {{ fun2.rfc }}
+        
+        {% for x in fun2 %}
+            {% if x.user_id == enc.rstep1 %}
+               
+              <a class="btn btn-success" href="#"><i cass="far fa-calendar-plus"></i>{{ enc.astep1 }} {{x.usuario}} <br> {{ enc.fstep1 |date:'d-M-y H:i'}}</a>
+            {% endif %}                      
+        {% endfor %} 
+        
+        {% for x in fun2 %}
+           {% if x.user_id == enc.rstep2 %}
+              <a class="btn btn-secondary" href="#"><i cass="far fa-calendar-plus"></i>{{ enc.astep2 }} {{x.usuario}} <br> {{ enc.fstep2 |date:'d-M-y H:i'}}</a>
+           {% endif %}                      
+        {% endfor %} 
+        {% for x in fun2 %}
+           {% if x.user_id == enc.rstep3 %}
+              <a class="btn btn-warning" href="#"><i cass="far fa-calendar-plus"></i>{{ enc.astep3 }} {{x.usuario}} <br> {{ enc.fstep3 |date:'d-M-y H:i'}}</a>
+           {% endif %}                      
+        {% endfor %} 
+        {% for x in fun2 %}
+           {% if x.user_id == enc.rstep4 %}
+              <a class="btn btn-info" href="#"><i cass="far fa-calendar-plus"></i>{{ enc.astep4 }} {{x.usuario}} <br> {{ enc.fstep4 |date:'d-M-y H:i'}}</a>
+           {% endif %}                      
+        {% endfor %} 
+        {% for x in fun2 %}
+           {% if x.user_id == enc.rstep5 %}
+              <a class="btn btn-dark" href="#"><i cass="far fa-calendar-plus"></i>{{ enc.astep5 }} {{x.usuario}} <br> {{ enc.fstep5 |date:'d-M-y H:i'}}</a>
+           {% endif %}                      
+        {% endfor %} 
+        {% for x in fun2 %}
+           {% if x.user_id == enc.rstep6 %}
+              <a class="btn btn-danger" href="#"><i cass="far fa-calendar-plus"></i>{{ enc.astep6 }} {{x.usuario}} <br>  {{ enc.fstep6 |date:'d-M-y H:i'}}</a>
+           {% endif %}                      
+        {% endfor %} 
+        
+     
+        {% if enc.id %}
+            <a href="{% url 'cto:coverletter_export' enc.id %}" class="fa fa-download">Contrato</a>
+          <!--  <button type="button" class="fa fa-download"" onclick="contrata({{enc.id}})">Contrato</button>-->
+        {% endif %}
+       
+        
+        <a href="{% url 'cto:contrato_list' %}" class="btn btn-danger">Salir</a>
+    </div>
+    
+    <div class="card-body" >
+        <div class="content">
+            <!-- Sección Superior -->
+            <div class="row">
+                <!-- Sección Izquierda -->
+                <div class="col-lg-6 form-group">
+                    <div class="content">
+                        <div class="row badge-primary">
+                           
+                            <div class="col-lg-12 text-center ">
+                               CONTRATO DE HONORARIOS ASIMILADOS A SALARIOS
+                            </div>
+                         
+                        </div>
+                        
+                          <div class="row badge-primary">
+                            
+                            <div class="col-lg-1 text-center">
+                               #
+                            </div>
+                            
+                            <div class="col-sm-3 pl-2">
+                                 <input type="number" name="enc_id" id="enc_id" readonly class="form-control  text-center" value = "{{ enc.id }}" >
+                            </div> 
+                            
+                            <div class="col-sm-3 form-group pl-0 pr-0" >
+                                    <input type="text"  name="datecontrato" id="datecontrato" class="form-control form-control-user  pl-0 text-center " 
+                                        value="{{ enc.datecontrato|date:'Y-m-d'}}" readonly >
+                            </div>
+                            
+                            <div class="col-lg-2  text-center">
+                               Status:
+                            </div>
+                            
+                            <div class="col-lg-3 text-center" >
+                                <input type="text" class="form-control" readonly  name="status" id="status"  style="color:blue;font-weight:bold;font-size:20px"
+                                    value="{{ enc.status }}">
+                            </div>
+
+                          </div>
+                                             
+                           
+                        <div class="row">  
+                           
+                            <div class="col-lg-2  text-left">
+                               Sujeto:
+                               
+                            </div>
+                               
+                            {% if enc.parte2 %}
+                                <div class="col-lg-10 form-group" >
+                                   {{ enc.parte2 }}
+                                </div>
+
+                              {% else %}
+                                <div class="col-lg-7 form-group">
+                                    <select name="enc_nombreParte" id="enc_nombreParte" class="form-control" required>
+                                        <option value="0">Buscar</option>
+                                        {% for item in fun3 %}
+                                            <option value="{{item.id}}">{{ item.nombreParte }} </option>
+                                        {% endfor %}
+                                     </select>
+                                
+                                
+                                </div>
+                                <div class="col-lg-3 ">
+                                    <a href="{% url 'cto:partes_list' %}" class="btn btn-success">Altas y cambios</a>
+
+                                </div>
+                          
+                            {% endif%}
+                            <script>
+                              (function(){
+                                const sel = document.getElementById('enc_nombreParte');
+                                if (!sel) return;
+                                let lastChecked = null;
+                                let alertOpen = false;
+                                sel.addEventListener('change', function(e){
+                                  // Ignora cambios programáticos (p.ej., .val().change())
+                                  if (e && e.isTrusted === false) return;
+                                  const id = this.value;
+                                  if (!id || id === '0') return;
+                                  if (lastChecked && String(lastChecked) === String(id)) return;
+                                  lastChecked = id;
+                                  if (alertOpen) return;
+                                  fetch(`/cto/partes/${id}/faltantes`, {headers: {'X-Requested-With':'XMLHttpRequest'}})
+                                    .then(r => { if(!r.ok) throw new Error('request'); return r.json(); })
+                                    .then(data => {
+                                      const missing = Array.isArray(data && data.missing) ? data.missing : [];
+                                      const count = (data && typeof data.count === 'number') ? data.count : missing.length;
+                                      if (count > 0) {
+                                        const labels = missing.map(m => (typeof m === 'string') ? m : (m.label || m.name || m)).join('\n');
+                                        if (window.Swal && Swal.fire) {
+                                          alertOpen = true;
+                                          Swal.fire({
+                                            title: 'Faltan datos del Sujeto',
+                                            html: `<pre style="text-align:left">${labels}</pre><p>¿Deseas completar ahora?</p>`,
+                                            icon: 'warning',
+                                            showCancelButton: true,
+                                            confirmButtonText: 'Editar ahora',
+                                            cancelButtonText: 'Continuar',
+                                            reverseButtons: true,
+                                            width: '40%'
+                                          }).then(res => {
+                                            alertOpen = false;
+                                            if (res.isConfirmed) {
+                                              if (typeof abrir_modal === 'function') abrir_modal(`/cto/partes/${id}`);
+                                              else window.location.href = `/cto/partes/${id}`;
+                                            }
+                                          });
+                                        } else {
+                                          if (typeof mensaje === 'function') mensaje(`Faltan datos del Sujeto:\n\n${labels}`, 'warning');
+                                        }
+                                      }
+                                    }).catch(()=>{});
+                                });
+                              })();
+                            </script>
+                          
+                             
+                    </div>
+                       
+                    <div class="row" p-2>    
+                      
+                        <div class="col-lg-6  text-left">
+                               Fecha de inicio del contrato:
+                               
+                        </div>
+                        
+                        <div class="col-lg-5" >
+                            <input type="text" style="width: 8rem;" name="enc_datecontrato_ini" id="enc_datecontrato_ini" placeholder="Fecha inicial" class="form-control form-control-user text-center" value="{{ enc.datecontrato_ini|date:'Y-m-d' }}"  required>
+                        </div>
+                      
+                    </div>
+                    
+                    <div class="row" p-2>    
+                      
+                        <div class="col-lg-6  text-left">
+                               Fecha del fin del contrato:
+                               
+                        </div>
+                        
+                        <div class="col-lg-5" >
+                            <input type="text" style="width: 8rem;" name="enc_datecontrato_fin" id="enc_datecontrato_fin" placeholder="Fecha final" class="form-control form-control-user text-center" value="{{ enc.datecontrato_fin|date:'Y-m-d' }}" required>
+                        </div>
+                      
+                    </div>   
+                        
+                     <div class="row" p-2>
+
+                        <div class="col-lg-6  text-left">
+                               Importe total del contrato:
+                               
+                        </div>
+
+                        <div class="col-lg-5">
+                            <input type="float"  class="form-control text-right" name="enc_importeContrato" id="enc_importeContrato" value="{{ enc.importeContrato }}" required>
+                        </div>
+                    
+                    </div> 
+                    
+                    <div class="row" p-2>
+
+                        <div class="col-lg-6  text-left">
+                               Número de pagos:
+                               
+                        </div>
+
+                        <div class="col-lg-4">
+                            <input type="number"  class="form-control text-right"  name="enc_npContrato" id="enc_npContrato" value="{{ enc.npContrato }}"  required>
+                        </div>
+                    
+                    </div>  
+
+                       <div class="row" p-2>
+
+                        <div class="col-lg-6  text-left">
+                               Importe por pago:
+                               
+                        </div>
+
+                        <div class="col-lg-5">
+                            <input type="float"  class="form-control text-right"  name="enc_imppContrato" id="enc_imppContrato"  value="{{ enc.imppContrato }}"  required>
+                        </div>
+                    
+                    </div>  
+
+                    <div class="row" p-2>
+
+                        <div class="col-lg-6  text-left">
+                               Total de horas:
+                               
+                        </div>
+
+                        <div class="col-lg-4">
+                            <input type="number"  class="form-control text-right"  name="enc_totalhorasContrato" id="enc_totalhorasContrato" value="{{ enc.totalhorasContrato }}" required>
+                        </div>
+                    
+                    </div>
+
+                    <div class="row">  
+                           
+                            <div class="col-lg-3  text-left">
+                               Testigo 1:
+                               
+                            </div>
+                            
+                            {% if enc.status == "CAP" %}
+                            
+                            <div class="col-lg-9 form-group">
+                                <select name="enc_testigoContrato1" id="enc_testigoContrato1" class="form-control" required>
+                                    <option value="0">Buscar</option>
+                                    {% for item in fun3 %}
+                                        <option value="{{item.nombreParte}}">{{ item.nombreParte }} </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            {% else %}
+                                <div class="col-lg-9 form-group" >
+                                   {{ enc.testigoContrato1 }}
+                                </div>
+
+                            {% endif%}
+                          
+                             
+                    </div>
+
+                    <div class="row">  
+                           
+                            <div class="col-lg-3  text-left">
+                               Testigo 2:
+                               
+                            </div>
+                            
+                            {% if enc.status == "CAP" %}
+                            
+                            <div class="col-lg-9 form-group">
+                                <select name="enc_testigoContrato2" id="enc_testigoContrato2" class="form-control" required>
+                                    <option value="0">Buscar</option>
+                                    {% for item in fun3 %}
+                                        <option value="{{item.nombreParte}}">{{ item.nombreParte }} </option>
+                                    {% endfor %}
+                                </select>
+                            
+                            </div>
+                            {% else %}
+                                <div class="col-lg-9 form-group" >
+                                   {{ enc.testigoContrato2 }}
+                                </div>
+
+                            {% endif%}
+                          
+                             
+                    </div>
+
+
+                        <hr>
+                   
+                    <button type="button" class="btn btn-primary" onclick="gracont({{enc.id}})">Enviar</button>
+                    
+            <!-- Modal -->            
+                        <div class="row p-2">
+                            {% if enc.fcap == null and enc.rcap == enc.current_user  and enc.uc_id == enc.current_user  %}
+                                
+                                
+
+                                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModalCentered">
+                                         Fin de proceso de CAPtura 
+                                </button>
+                                  
+                    
+                                <div class="modal" id="exampleModalCentered" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                          <h5 class="modal-title" id="exampleModalCenteredLabel">Transferir al siguiente proceso</h5>
+                                           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            
+                                          <p class="m-0 font-weight-bold text-primary"> Firma electrónica y enviar a--> {{ enc.astep1 }} ?</p>
+                                            
+                                        </div>
+                                        <div class="modal-footer">
+                                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                          
+                                          <button type="button" class="btn btn-primary" onclick="avanza({{enc.id}})">Enviar</button>
+                                       
+                                            
+                                        </div>
+                                      </div>
+                                    </div>
+                                </div>
+                            {% else %}
+                                {% if enc.fstep1 == null and enc.rstep1 == user.id and enc.imp_total and enc.uc_id == enc.devuelto_por %}
+                                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModalCentered">
+                                         Fin de proceso de {{ enc.astep1 }} 
+                                </button>
+                                  
+                                <!-- Modal -->
+                                <div class="modal" id="exampleModalCentered" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                          <h5 class="modal-title" id="exampleModalCenteredLabel">Transferir al siguiente proceso</h5>
+                                           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            
+                                          <p class="m-0 font-weight-bold text-primary"> Firma electrónica y enviar a--> {{ enc.astep2 }} ?</p>
+                                            
+                                        </div>
+                                        <div class="modal-footer">
+                                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                          
+                                          <button type="button" class="btn btn-primary" onclick="avanza({{enc.id}})">Enviar</button>
+                                           
+                                        {% if enc.astep1 == "REV" or  enc.astep1 == "AUT"  %}                               
+                                           <button type="button" class="btn btn-danger" onclick="devuelve({{enc.id}})">Devolver</button> 
+                                        {% endif %}
+                                              
+                                        </div>
+                                       
+                                      </div>
+                                    </div>
+                                </div>
+                                {% else %}
+                                    {% if enc.fstep2 == null and enc.rstep2 == user.id and enc.imp_total  and enc.fstep1 != null and enc.uc_id == enc.devuelto_por %}
+                                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModalCentered">
+                                         Fin de proceso de {{ enc.astep2 }} 
+                                </button>
+                                  
+                                <!-- Modal -->
+                                <div class="modal" id="exampleModalCentered" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                          <h5 class="modal-title" id="exampleModalCenteredLabel">Transferir al siguiente proceso</h5>
+                                           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            
+                                          <p class="m-0 font-weight-bold text-primary"> Firma electrónica y enviar a--> {{ enc.astep3 }} ?</p>
+                                            
+                                        </div>
+                                        <div class="modal-footer">
+                                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                          
+                                          <button type="button" class="btn btn-primary" onclick="avanza({{enc.id}})">Enviar</button>
+                                           
+                                           {% if enc.astep2 == "REV" or  enc.astep2 == "AUT"  %}                               
+                                           
+                                           <button type="button" class="btn btn-danger" onclick="devuelve({{enc.id}})">Devolver</button> 
+                                            
+                                            {% endif %}  
+                                        </div>
+                                      </div>
+                                    </div>
+                                </div>
+                                    {% else %}
+                                        {% if enc.fstep3 == null and enc.rstep3 == user.id and enc.imp_total and enc.fstep2 != null and enc.uc_id == enc.devuelto_por %}
+                                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModalCentered">
+                                         Fin de proceso de {{ enc.astep3 }} 
+                                </button>
+                                  
+                                <!-- Modal -->
+                                <div class="modal" id="exampleModalCentered" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                          <h5 class="modal-title" id="exampleModalCenteredLabel">Transferir al siguiente proceso</h5>
+                                           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            
+                                          <p class="m-0 font-weight-bold text-primary"> Firma electrónica y enviar a--> {{ enc.astep4 }} ?</p>
+                                            
+                                        </div>
+                                        <div class="modal-footer">
+                                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                          
+                                          <button type="button" class="btn btn-primary" onclick="avanza({{enc.id}})">Enviar</button>
+                                        
+                                        {% if enc.astep3 == "REV" or  enc.astep3 == "AUT"  %}                               
+                                           
+                                           <button type="button" class="btn btn-danger" onclick="devuelve({{enc.id}})">Devolver</button> 
+                                            
+                                            {% endif %}  
+                                        </div>
+                                      </div>
+                                    </div>
+                                </div>
+                                       {% else %}
+                                            {% if enc.fstep4 == null and enc.rstep4 == user.id and enc.imp_total and enc.fstep3 != null and enc.uc_id == enc.devuelto_por  %}
+                                           <button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModalCentered">
+                                         Fin de proceso de {{ enc.astep4 }} 
+                                </button>
+                                  
+                                <!-- Modal -->
+                                <div class="modal" id="exampleModalCentered" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                          <h5 class="modal-title" id="exampleModalCenteredLabel">Transferir al siguiente proceso</h5>
+                                           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            
+                                          <p class="m-0 font-weight-bold text-primary"> Firma electrónica y enviar a--> {{ enc.astep5 }} ?</p>
+                                            
+                                        </div>
+                                        <div class="modal-footer">
+                                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                          
+                                          <button type="button" class="btn btn-primary" onclick="avanza({{enc.id}})">Enviar</button>
+                                        </div>
+                                      {% if enc.astep4 == "REV" or  enc.astep4 == "AUT"  %}                               
+                                           
+                                           <button type="button" class="btn btn-danger" onclick="devuelve({{enc.id}})">Devolver</button> 
+                                            
+                                            {% endif %}  
+                                      
+                                      
+                                      </div>
+                                    </div>
+                                </div>        
+                                             {% else %}
+                                                {% if enc.fstep5 == null and enc.rstep5 == user.id and enc.imp_total and enc.fstep4 != null and enc.uc_id == enc.devuelto_por  %}
+                                         
+                                           <button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModalCentered">
+                                         Fin de proceso de {{ enc.astep5 }} 
+                                </button>
+                                  
+                                <!-- Modal -->
+                                <div class="modal" id="exampleModalCentered" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                          <h5 class="modal-title" id="exampleModalCenteredLabel">Transferir al siguiente proceso</h5>
+                                           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            
+                                          <p class="m-0 font-weight-bold text-primary"> Firma electrónica y enviar a--> {{ enc.astep6 }} ?</p>
+                                            
+                                        </div>
+                                        <div class="modal-footer">
+                                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                          
+                                          <button type="button" class="btn btn-primary" onclick="avanza({{enc.id}})">Enviar</button>
+                                       
+                                        {% if enc.astep5 == "REV" or  enc.astep5 == "AUT"  %}                               
+                                           
+                                           <button type="button" class="btn btn-danger" onclick="devuelve({{enc.id}})">Devolver</button> 
+                                            
+                                            {% endif %}  
+                                        
+                                        </div>
+                                      </div>
+                                    </div>
+                                </div>        
+
+                                                {% else %}
+                                                     {% if enc.fstep6 == null and enc.rstep6 == user.id and enc.imp_total and enc.fstep5 != null and enc.uc_id == enc.devuelto_por %}
+                                           <button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModalCentered">
+                                         Fin de proceso de {{ enc.astep6 }} 
+                                </button>
+                                  
+                                <!-- Modal -->
+                                <div class="modal" id="exampleModalCentered" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                          <h5 class="modal-title" id="exampleModalCenteredLabel">Transferir al siguiente proceso</h5>
+                                           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            
+                                          <p class="m-0 font-weight-bold text-primary"> Firma electrónica FIN de trámite--> {{ enc.astep6 }} ?</p>
+                                            
+                                        </div>
+                                        <div class="modal-footer">
+                                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                          
+                                          <button type="button" class="btn btn-primary" onclick="avanza({{enc.id}})">Enviar</button>
+                                       
+                                        
+                                        
+                                        </div>
+                                      </div>
+                                    </div>
+                                </div>         
+                                                
+                                                
+                                                {% endif %}
+                                             {% endif %}
+                                          {% endif %}  
+                                       {% endif %}
+                                    {% endif %}
+                                {% endif %}
+                            {% endif %}
+                                 
+
+                        </div>
+                    </div>
+                </div>
+                <!-- Fin Sección Izquierda -->
+
+        
+                <!-- Sección Derecha -->
+                <div class="col-lg-6 from-group bg-warning ">
+                    
+                    <div class="row">
+                        {% if enc.status == "CAP" %}   
+                        <div class="col-lg-12 text-center text-dark badge-success ">
+                               SUBIR DOCUMENTOS
+                        </div>
+                        
+                        
+                        {% endif  %}   
+                    </div>
+                    <hr>
+                    <div class="row" pt-2>    
+                            <div class="col-lg-10 form-group" pt-2 >
+                                <select name="documento" id="documento" class="form-control"  required>
+                                    <option value="0">Buscar</option>
+                                    {% for item in  requi %}
+                                        <option value="{{item.id}}">{{ item.requisito }} </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                    </div>
+                    <div class="row" p-2>    
+                     
+                        <div class="col-lg-5  text-left">
+                               Fecha de caducidad:
+                               
+                        </div>
+                        
+                        <div class="col-lg-7" >
+                            <input type="text" style="width: 8rem;" name="enc_vigenciaFinDocto" id="enc_vigenciaFinDocto" placeholder="Caducidad" class="form-control form-control-user text-center"  >
+                        </div>
+                        
+                    </div>
+                    <hr>
+                    <div class="row">
+                            <div class="col-lg-12">
+                                <textarea class="form-control" name="comentarioDocto" id="comentarioDocto" rows ="4"  placeholder="Comentarios del documento "></textarea>
+                            </div>
+                    </div>
+                    
+                   <hr>
+                        <div class="row">
+                            <div class="col-lg-12">
+                            
+                                  <input type="file" name="pdf">
+                                  <button type="submit">Subir</button>
+                                  {% if url %}
+                                    <p>Uploaded file: <a href="{{ url }}">{{ url }}</a></p>
+                                  {% endif %}
+                                
+                           </div>
+                        </div>
+                    
+                    
+                    
+                        
+                                        
+                    
+                    
+                    <hr>
+                    
+                    
+                </div>
+        
+                <!-- Fin Sección Derecha -->
+            </div>
+            <!-- Fin Sección Superior -->
+            <!-- Inicio Detalle -->
+            <hr>
+            <div class="row p-1">
+                <div>
+                    <table
+                        id="table"
+                        class="table table-sm"
+                        data-toggle="table"
+                        data-pagination="true"
+                        data-search="true"
+                        data-show-columns="true"
+                        data-show-toggle="true"
+                        data-show-fullscreen="true"
+                        data-toolbar=".buttons-toolbar"
+                        data-locale="es-MX"
+                        >
+                        <thead>
+                            <th data-field="pdf">Imagen</th>
+                            <th data-sortable="true" data-field="documento">Documento</th>      
+                            <th data-sortable="true" data-field="vigenciaFinDocto">Caducidad-</th>
+                            
+                            
+                            <th data-sortable="true" data-field="comentarioDocto&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;">Comentarios</>
+                              
+                            
+                           
+                      
+                             <th class="all" >Editar</th>
+                                
+                           
+                             
+                           
+                        </thead>
+                        <tbody>
+                            {% for item in det%}
+                           
+                            <tr>
+                                <td>
+                                <iframe src="{{ item.pdf.url }}" width="400" height="400"  style="border:1px solid black;" allowfullscreen>
+                                </iframe>
+                                
+                                
+                                </td>
+                                
+                                <td>{{ item.documento }}</td>
+                                <td>{{ item.vigenciaFinDocto|date:'Y-M-d' }}</td>
+                          
+                                <td>{{ item.comentarioDocto }}</td>
+                            
+                               
+                               
+                                <td>
+                                    <button class="btn btn-warning btn-circle" onclick="return abrir_modal('{% url 'cto:contrato_edit' item.id%}')"><i class="far fa-edit"></i></button>
+                                </td>
+                               
+                                
+                                 
+                                 
+                                
+                                
+                           
+                            </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- Fin Detalle -->
+        </div>
+    </div>
+</div>
+</form>
+{% endblock %}
+{% block js_page %}
+<script>
+     
+    
+    function buscarFuncionario()
+    {
+        if ($("#enc_nombreParte").val()==="0" || $("#enc_nombreParte").val()===null){
+            mensaje("Sujeto No Seleccionado",'red');
+            return false;
+        }
+
+        var codigo = $("#codigo").val();
+        if(codigo===""){
+            return false;
+        }
+
+        var path = "{% url 'api:contratos_list' %}" + codigo;
+        $.ajax({
+            type:"GET",
+            url: path,
+            success: function(r){
+                
+
+                if(!r.estado){
+                    mensaje("Funcionario está inactivo",'orange')
+                    $("#codigo").val("");
+                    $("#nombreParte").val("");
+                    
+                    $("#codigo").focus();
+                    return false;
+                }
+
+                $("#codigo").val(r.codigo);
+                $("#nombreParte").val(r.nombreParte);
+                
+                $("#cantidad").focus();
+
+            },
+            error: function(a,b,c){
+                console.log(a);
+                // console.log(b);
+                // console.log(c);
+                // console.log(a.status)
+                // console.log(a.responseText.detail);
+                // a.responseText["detail"]
+                // mensaje(c,'red');
+                if(a.status==404){
+                    mensaje(" -" + codigo + "- No Encontrado o No Existe",'red');
+                    $("#codigo").val("");
+                    $("#nombre_funcionario").val("");
+                    
+                    $("#codigo").focus();
+                }
+
+            }
+
+        });
+    }
+    
+    
+    
+    $(function () {
+        $("#enc_datecontrato_ini").datetimepicker({
+            format: 'Y-m-d',
+            timepicker:false
+        });
+
+        $("#enc_datecontrato_fin").datetimepicker({
+            format: 'Y-m-d',
+            timepicker:false
+        });
+
+       
+        $("#enc_vigenciaFinDocto").datetimepicker({
+            format: 'Y-m-d',
+            timepicker:false
+        });
+        $("#sidebarToggle").click();
+        $('#enc_nombreParte').select2({
+            selectOnBlur: true,
+            placeholder: "Seleccione Sujeto del contrato",
+            allowClear: true
+           
+        });
+        
+        $('#documento').select2({
+            placeholder: "Seleccione el documento",
+            allowClear: true
+        });
+        
+        $("#sidebarToggle").click();
+        $('#enc_testigoContrato1').select2({
+            tags: true,
+            selectOnBlur: true,
+            //multiple: true,
+            placeholder: "Seleccione al primer testigo",
+            //allowClear: true
+        });    
+
+        
+        $('#enc_testigoContrato2').select2({
+            placeholder: "Seleccione al segundo testigo",
+            allowClear: true
+        });    
+
+        $('#xdepartamento').select2({
+            placeholder: "Seleccione Depto",
+            allowClear: true
+            
+        });
+
+        $("#btnBuscar").click(function(e){
+            if ($("#enc_nombreParte").val()==="0"){
+                mensaje("Seleccione el Beneficiario",'red');
+                return false;
+            }
+            abrir_modal("{% url 'cto:buscar_parte' %}");
+        });
+
+        $("#codigo").keypress(function(e){
+            if(e.keyCode===13){
+                e.preventDefault();
+                buscarFuncionario();
+            }
+        });
+
+        
+      
+        
+        $("#Folio").click(function(e){
+            if ($("#enc_nombreParte").val()===null ){
+                mensaje("Seleccione el Beneficiario",'red');
+                return false;
+            
+            }
+        });
+        
+        
+
+        $("#enc_id").val("{{ enc.id }}");
+        
+        $("#enc_nombreParte").val("{{ enc.nombreParte.id }}").change();
+
+        $("#documento").val("{{ det.documento.id }}").change();
+
+        $("#enc_testigoContrato1").val("{{ enc.testigoContrato1 }}").change();
+        
+        $("#enc_testigoContrato2").val("{{ enc.testigoContrato2 }}").change();
+        
+        $("#comentarioDocto").val("{{ det.comentarioDocto }}").change();
+
+
+        $("#status").val("{{ enc.status }}");
+        
+        $("#enc_datecontrato_ini").val("{{ enc.datecontrato_ini|date:'Y-m-d' }}");
+        
+        $("#enc_datecontrato_fin").val("{{ enc.datecontrato_fin|date:'Y-m-d' }}");
+                
+        
+        $("#Folio").val("{{ det.no_facturasol }}").change();  
+
+    });
+
+function avanza(id)
+  {
+    // Validar beneficiarios del Sujeto antes de avanzar
+    var sujetoId = $('#enc_nombreParte').val() || "{{ enc.nombreParte.id }}";
+    if (!sujetoId || sujetoId === '0' || sujetoId === 'None') {
+      mensaje('Seleccione el Sujeto del contrato','error');
+      return;
+    }
+    fetch('/cto/partes/' + sujetoId + '/faltantes', {headers: {'X-Requested-With':'XMLHttpRequest'}})
+      .then(function(resp){ if(!resp.ok) throw new Error('request'); return resp.json(); })
+      .then(function(data){
+        var missing = Array.isArray(data && data.missing) ? data.missing : [];
+        var faltaBenef = missing.some(function(m){ return (m.field||m.name||'') === 'beneficiarios'; });
+        if (faltaBenef) {
+          // Permitir continuar bajo confirmación; opción para capturar ahora abre el modal
+          return new Promise(function(resolve, reject){
+            if (window.Swal && Swal.fire) {
+              Swal.fire({
+                title: 'Beneficiarios faltantes',
+                text: 'Falta capturar al menos un beneficiario. ¿Deseas continuar y completarlo después?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Continuar',
+                cancelButtonText: 'Capturar ahora',
+                width: '40%'
+              }).then(function(res){
+                if (res.isConfirmed) {
+                  resolve();
+                } else {
+                  if (typeof abrir_modal === 'function') abrir_modal('/cto/partes/' + sujetoId);
+                  reject(new Error('stop'));
+                }
+              });
+            } else {
+              var ok = window.confirm('Faltan beneficiarios. ¿Continuar y completar después?');
+              if (ok) resolve(); else { if (typeof abrir_modal === 'function') abrir_modal('/cto/partes/' + sujetoId); reject(new Error('stop')); }
+            }
+          });
+        }
+      })
+      .then(function(){
+        Swal.fire({
+	          title: 'Enviado !',
+	          icon: 'success',
+              width: '30%'
+            });
+        var data = {id:id};
+        data = JSON.stringify(data);
+        var token = '{{csrf_token}}';
+        $.ajax({
+          headers : {"X-CSRFToken": token},
+          type:"POST",
+          url:"/cto/contratos/avanza/"+id,
+          data: data,
+          success: function(response){
+            if(response==="OK")
+            {
+               window.location.href = "/cto/contratos/";
+            }
+            else{
+              mensaje("Error Intentado Cambiar Status");
+            }
+          },
+          error: function(jqXHR, textStatus, errorThrow){
+            console.log(textStatus, errorThrow);
+            mensaje(errorThrow,'red');
+            cerrar_modal();
+          }
+        });
+      })
+      .catch(function(e){ /* si e==='stop' ya mostramos alerta y modal */ });
+  }
+function devuelve(id)
+  {
+    if (window.Swal && Swal.fire) {
+      Swal.fire({ title: 'Devuelto', icon: 'success', width: '30%' });
+    } else if (typeof mensaje === 'function') {
+      mensaje('Devuelto','success');
+    }
+    var data = {id:id};
+    data = JSON.stringify(data);
+    var token = '{{csrf_token}}';
+    // alert(token);
+    // alert(id);
+    
+    $.ajax({
+      headers : {"X-CSRFToken": token},
+      type:"POST",
+      url:"/cto/contratos/devuelve/"+id,
+      data: data,
+      success: function(response){
+        if(response==="OK")
+        {
+          
+         window.location.href = "/cto/contratos/";
+          
+        }
+        else{
+          mensaje("Error Intentado Cambiar Status");
+        }
+      },
+      error: function(jqXHR, textStatus, errorThrow){
+        console.log(textStatus, errorThrow);
+        mensaje(errorThrow,'red');
+        cerrar_modal();
+      }
+    });
+  }
+// Call the dataTables jQuery plugin
+// $(document).ready(function() {
+//   $('.table').DataTable();
+// });
+
+
+function contrata(id)
+  {
+    if (window.Swal && Swal.fire) {
+      Swal.fire({ title: 'Contrato generado', icon: 'success', width: '30%' });
+    } else if (typeof mensaje === 'function') {
+      mensaje('Contrato generado','success');
+    }
+    var data = {id:id};
+    data = JSON.stringify(data);
+    var token = '{{csrf_token}}';
+    // alert(token);
+    // alert(id);
+    
+    $.ajax({
+      headers : {"X-CSRFToken": token},
+      type:"POST",
+      url:"/cto/contratos/contrata/"+id,
+      data: data,
+      success: function(response){
+        if(response==="OK")
+        {
+          
+         window.location.href = "/cto/contratos/";
+          
+        }
+        else{
+          mensaje("Error Intentado Imprimir contrato");
+        }
+      },
+      error: function(jqXHR, textStatus, errorThrow){
+        console.log(textStatus, errorThrow);
+        mensaje(errorThrow,'red');
+        cerrar_modal();
+      }
+    });
+  }
+// Call the dataTables jQuery plugin
+// $(document).ready(function() {
+//   $('.table').DataTable();
+// });   
+
+function gracont(id)
+  {
+    //alert("guardado ok !!");
+  
+    var data = {id:id,
+               enc_datecontrato_ini : $("input[name='enc_datecontrato_ini']").val(),
+               enc_datecontrato_fin : $("input[name='enc_datecontrato_fin']").val(), };
+  data = JSON.stringify(data);
+  var token = '{{csrf_token}}';
+    // alert(id);
+    
+    $.ajax({
+      headers : {"X-CSRFToken": token},
+      type:"POST",
+      url:"/cto/contratos/gracont/"+id,
+      data: data,
+           
+      success: function(response){
+        if(response==="OK")
+        {
+           window.location.href = "/cto/contratos/";
+        }
+  else{
+          mensaje("Error Intentado guardar");
+        }
+      },
+      error: function(jqXHR, textStatus, errorThrow){
+        console.log(textStatus, errorThrow);
+        mensaje(errorThrow,'red');
+        cerrar_modal();
+      }
+    });
+  }  
+
+</script>
+{% endblock %}

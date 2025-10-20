@@ -1,0 +1,1560 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% load formatags %}
+
+
+{% block top_bar %}
+  <div class="page-title-bar">
+    <div class="page-title"><i class="fas fa-file-signature"></i> {{ tipocont.tipoContrato }}</div>
+    <div class="page-sub">
+      <span class="chip"><i class="fas fa-user"></i> {{ user.username }} {{ user.last_name }} {{ user.first_name }}</span>
+      {% if secuencia_data %}<span class="chip"><i class="fas fa-hashtag"></i> {{ secuencia_data }}</span>{% endif %}
+      {% for depa in departamentos %}
+        <span class="chip"><i class="fas fa-building"></i> {{ depa.claveDepartamento }} - {{ depa.nombreDepartamento }}</span>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock top_bar %}
+
+{% block page_content %}
+
+<form method="post" enctype="multipart/form-data" id="frmSolicitudes"  >
+    {% csrf_token %}    
+
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+      {{ fun2.rfc }}
+        
+        {% for x in fun2 %}
+            {% if x.user_id == enc.rstep1 %}
+              <a class="btn btn-success" href="#"><i cass="far fa-calendar-plus"></i>{{ enc.astep1 }} {{x.usuario}} <br> {{ enc.fstep1 |date:'d-M-y H:i'}}</a>
+            {% endif %}                      
+        {% endfor %} 
+        
+        {% for x in fun2 %}
+           {% if x.user_id == enc.rstep2 %}
+              <a class="btn btn-secondary" href="#"><i cass="far fa-calendar-plus"></i>{{ enc.astep2 }} {{x.usuario}} <br> {{ enc.fstep2 |date:'d-M-y H:i'}}</a>
+           {% endif %}                      
+        {% endfor %} 
+
+        {% for x in fun2 %}
+           {% if x.user_id == enc.rstep3 %}
+              <a class="btn btn-warning" href="#"><i cass="far fa-calendar-plus"></i>{{ enc.astep3 }} {{x.usuario}} <br> {{ enc.fstep3 |date:'d-M-y H:i'}}</a>
+           {% endif %}                      
+        {% endfor %} 
+
+        {% for x in fun2 %}
+           {% if x.user_id == enc.rstep4 %}
+              <a class="btn btn-info" href="#"><i cass="far fa-calendar-plus"></i>{{ enc.astep4 }} {{x.usuario}} <br> {{ enc.fstep4 |date:'d-M-y H:i'}}</a>
+           {% endif %}                      
+        {% endfor %} 
+        
+        {% for x in fun2 %}
+           {% if x.user_id == enc.rstep5 %}
+              <a class="btn btn-dark" href="#"><i cass="far fa-calendar-plus"></i>{{ enc.astep5 }} {{x.usuario}} <br> {{ enc.fstep5 |date:'d-M-y H:i'}}</a>
+           {% endif %}                      
+        {% endfor %} 
+        {% for x in fun2 %}
+           {% if x.user_id == enc.rstep6 %}
+              <a class="btn btn-danger" href="#"><i cass="far fa-calendar-plus"></i>{{ enc.astep6 }} {{x.usuario}} <br>  {{ enc.fstep6 |date:'d-M-y H:i'}}</a>
+           {% endif %}                      
+        {% endfor %} 
+        
+     
+        {% if enc.id %}
+            <a href="{% url 'cto:coverletter_export' enc.id %}" class="fa fa-download fa-1x blinking-text">Descargar Contrato</a>
+          <!--  <button type="button" class="fa fa-download"" onclick="contrata({{enc.id}})">Contrato</button>-->
+        {% endif %}
+       
+        
+        <a href="{% url 'cto:contrato_list' %}" class="btn btn-danger">Salir</a>
+    </div>
+    
+    <div class="card-body" >
+        <div class="content">
+            <!-- Sección Superior -->
+            <div class="row">
+                <!-- Sección Izquierda -->
+                <div class="col-lg-6 form-group">
+                    <div class="content">
+                        <div class="row badge-primary">
+                            <div class="col-lg-4 text-left ">
+                               #Contrato  
+                            </div>
+                            <div class="col-lg-4 text-left ">
+                               Fecha  
+                            </div>
+                            <div class="col-lg-4 text-left ">
+                               Status  
+                            </div>
+                          </div>
+                        
+                        <div class="row badge-primary">
+                            {% comment %} <div class="col-lg-1 text-center">
+                               #
+                            </div> {% endcomment %}
+                            <div class="col-sm-3 pl-2">
+                                 <input type="number" name="enc_id" id="enc_id" readonly class="form-control  text-center" value = {{ enc.id }} >
+                            
+                            </div> 
+                            <div class="col-sm-4 form-group pl-0 pr-0" >
+                                    <input type="text"  name="datecontrato" id="datecontrato" class="form-control form-control-user  pl-0 text-center " 
+                                        value="{{ enc.datecontrato|date:'Y-m-d'}}" readonly >
+                            </div>
+                            {% comment %} <div class="col-lg-2  text-center">
+                               Status:
+                            </div> {% endcomment %}
+                            <div class="col-lg-3 text-center" >
+                                <input type="text" class="form-control" readonly  name="status" id="status"  style="color:blue;font-weight:bold;font-size:20px"
+                                    value="{{ enc.status }}">
+                            </div>
+                         </div>
+                                             
+                           
+                        <div class="row"  >  
+                            {% if enc.parte2 %}
+                                <div  class="col-lg-10 form-group" ><mark>
+                                   {{ enc.parte2 }} 
+                                  </mark></div>
+                            {% else %}
+                                <div class="col-lg-10 form-group">
+                                    <select name="enc_nombreParte" id="enc_nombreParte" class="form-control" required>
+                                        <option value="0">Seleccione el Sujeto del contrato</option>
+                                        {% for item in fun3 %}
+                                            <option value="{{item.id}}">{{ item.nombreParte }} </option>
+                                        {% endfor %} 
+                                     </select>
+                                </div>
+                            {% endif%}
+                            
+                            
+                         <div class="container">    
+                            {% if tipocont.id == 11 %}
+                                   
+                                   <div class="row">
+
+                                   {% comment %} <div class="col-lg-3  text-left">
+                                      <label for="empresa">Nombre de la Empresa:</label>
+                                   </div> {% endcomment %}
+                                      {% if enc.empresa %}
+                                        {{ enc.empresa }}
+                                      {% else %}
+                                         <div class="col-lg-11 ">
+                                             <input type="text"  class="form-control text-left"  name="enc_empresa" id="enc_empresa" value="{{ enc.empresa }}"  placeholder="Nombre de la Empresa" required>
+                                          </div>
+                                      {% endif %} 
+                                    </div>
+                                    <div class="row">
+
+                                      {% comment %} <div class="col-lg-3  text-left">
+                                         <label for="rfc_sociedad">Nombre de la rfc_sociedad:</label>
+                                      </div> {% endcomment %}
+                                         {% if enc.rfc_sociedad %}
+                                           {{ enc.rfc_sociedad }}
+                                         {% else %}
+                                            <div class="col-lg-11 ">
+                                                <input type="text"  class="form-control text-left"  name="enc_rfc_sociedad" id="enc_rfc_sociedad" value="{{ enc.rfc_sociedad }}"  placeholder="RFC de la Sociedad" required>
+                                             </div>
+                                         {% endif %} 
+                                       </div>
+                            
+                                     <div class="row">
+
+                                   {% comment %} <div class="col-lg-3  text-left">
+                                      <label for="tipo_sociedad">Tipo de Sociedad:</label>
+                                   </div> {% endcomment %}
+                                      
+                                   
+                                   
+                                   
+                                   {% if enc.tipo_sociedad %}
+                                        {{ enc.tipo_sociedad }}
+                                      {% else %}
+                                         <div class="col-lg-11">
+                                             <input type="text"  class="form-control text-left"  name="enc_tipo_sociedad" id="enc_tipo_sociedad" value="{{ enc.tipo_sociedad }}"  placeholder="Tipo de Sociedad"required>
+                                          </div>
+                                      
+                                          {% endif %}
+                                    </div> 
+                                    
+                                    <div class="row">
+                                    {% if enc.testimonio %}
+                                       {{ enc.testimonio}}
+                                    {% else %}
+                                       
+                                         <div class="col-lg-11">
+                                              <textarea class="form-control" name="enc_testimonio" id="enc_testimonio" rows ="2"  placeholder="Descripción de la Escritura Pública " ></textarea>
+                                         </div>
+                                      
+                                    {% endif %}
+                                  </div> 
+
+                                  <div class="row"> 
+                                  {% if enc.domicilio_sociedad %}
+                                       {{ enc.domicilio_sociedad}}
+                                    {% else %}
+                                      
+                                         <div class="col-lg-11">
+                                              <textarea class="form-control" name="enc_domicilio_sociedad" id="enc_domicilio_sociedad" rows ="2"  placeholder="Domicilio de la Sociedad" ></textarea>
+                                         </div>
+                                      
+                                    {% endif %}
+                                    </div>
+
+                                    <div class="row">
+                                    {% if enc.clausula %}
+                                       {{ enc.clausula}}
+                                    {% else %}
+                                      
+                                         <div class="col-lg-11">
+                                              <textarea class="form-control" name="enc_clausula" id="enc_clausula" rows ="2"  placeholder="Claúsula en donde se designa al Representante Legal" ></textarea>
+                                         </div>
+                                      
+                                    {% endif %}
+                                    </div>  
+                                    
+                                    <div class="row">
+                                    {% if enc.objeto_social %}
+                                       {{ enc.objeto_social}}
+                                    {% else %}
+                                      
+                                         <div class="col-lg-11">
+                                              <textarea class="form-control" name="enc_objeto_social" id="enc_objeto_social" rows ="2"  placeholder="Actividad Principal " ></textarea>
+                                         </div>
+                                       
+                                    {% endif %}   
+
+                                    </div>
+                            {% endif%}
+                           </div>
+                    </div>
+                    {% comment %} <div id="mensaje1" class="errores">Seleccione el sujeto del contrato</div> {% endcomment %}
+                   
+                    <hr>
+                    <div class="row" p-2>    
+                      
+                        <div class="col-lg-7  text-left">
+                               Fecha de inicio del contrato:
+                                
+                        </div>
+                        {% comment %} {{ enc.datecontrato_ini  }} {% endcomment %}
+                        {% if enc.datecontrato_ini %}
+                        <div class="col-lg-5 form-group" >
+                                   {{ enc.datecontrato_ini|date:'Y-m-d' }}
+                        </div>
+                      {% else %}
+                        <div class="col-lg-5" >
+                            <input type="text" style="width: 8rem;" name="enc_datecontrato_ini" id="enc_datecontrato_ini" placeholder="Fecha inicial" class="form-control form-control-user text-center" value="{{ enc.datecontrato_ini|date:'Y-m-d' }}"  required>
+                        </div>
+                      {% endif %}
+                    </div>
+          
+                    {% if tipocont.id == 13 %}
+                       
+                      <div class="row" p-2>
+
+                          <div class="col-lg-5  text-left">
+                             Marca del Vehículo:
+                          </div>
+                         {% if enc.marcaVehiculo %}
+                            {{ enc.marcaVehiculo }}
+                         {% else %}
+                            <div class="col-lg-6">
+                               <input type="text"  class="form-control text-left"  name="enc_marcaVehiculo" id="enc_marcaVehiculo" value="{{ enc.marcaVehiculo }}"  required>
+                           </div>
+                         {% endif %}
+                      </div>
+                      
+                      <div class="row" p-2>
+
+                        <div class="col-lg-5  text-left">
+                           Modelo:
+                        </div>
+                       {% if enc.modeloVehiculo %}
+                          {{ enc.modeloVehiculo }}
+                       {% else %}
+                          <div class="col-lg-6">
+                             <input type="text"  class="form-control text-left"  name="enc_modeloVehiculo" id="enc_modeloVehiculo" value="{{ enc.modeloVehiculo }}"  required>
+                         </div>
+                       {% endif %}
+                      </div>  
+                    
+                      <div class="row" p-2>
+
+                        <div class="col-lg-5  text-left">
+                           Tipo de Vehículo:
+                        </div>
+                       {% if enc.tipoVehiculo %}
+                          {{ enc.tipoVehiculo }}
+                       {% else %}
+                          <div class="col-lg-6">
+                             <input type="text"  class="form-control text-left"  name="enc_tipoVehiculo" id="enc_tipoVehiculo" value="{{ enc.tipoVehiculo }}"  required>
+                         </div>
+                       {% endif %}
+                      </div>  
+
+                      <div class="row" p-2>
+
+                        <div class="col-lg-5  text-left">
+                           Motor:
+                        </div>
+                       {% if enc.motorVehiculo %}
+                          {{ enc.motorVehiculo }}
+                       {% else %}
+                          <div class="col-lg-6">
+                             <input type="text"  class="form-control text-left"  name="enc_motorVehiculo" id="enc_motorVehiculo" value="{{ enc.motorVehiculo }}"  required>
+                         </div>
+                       {% endif %}
+                      </div>
+
+                      <div class="row" p-2>
+                        <div class="col-lg-5  text-left">
+                           Serie:
+                        </div>
+                       {% if enc.serieVehiculo %}
+                          {{ enc.serieVehiculo }}
+                       {% else %}
+                          <div class="col-lg-6">
+                             <input type="text"  class="form-control text-left"  name="enc_serieVehiculo" id="enc_serieVehiculo" value="{{ enc.serieVehiculo }}"  required>
+                         </div>
+                       {% endif %}
+                      </div>
+                      
+                      <div class="row" p-2>
+                        <div class="col-lg-5  text-left">
+                           Placas:
+                        </div>
+                       {% if enc.placasVehiculo %}
+                          {{ enc.placasVehiculo }}
+                       {% else %}
+                          <div class="col-lg-6">
+                             <input type="text"  class="form-control text-left"  name="enc_placasVehiculo" id="enc_placasVehiculo" value="{{ enc.placasVehiculo }}"  required>
+                         </div>
+                       {% endif %}
+                      </div>
+
+                      <div class="row" p-2>
+                        <div class="col-lg-5  text-left">
+                           Factura:
+                        </div>
+                       {% if enc.facturaVehiculo %}
+                          {{ enc.facturaVehiculo }}
+                       {% else %}
+                          <div class="col-lg-6">
+                             <input type="text"  class="form-control text-left"  name="enc_facturaVehiculo" id="enc_facturaVehiculo" value="{{ enc.facturaVehiculo }}"  required>
+                         </div>
+                       {% endif %}
+                      </div>
+                     
+                      <div class="row" p-2>
+                        <div class="col-lg-5  text-left">
+                           Fecha de la Factura:
+                        </div>
+                       {% if enc.fechaFactura %}
+                              {{ enc.fechaFactura|date:'Y-m-d' }}  
+                       {% else %}
+                          <div class="col-lg-6">
+                             <input type="text"  class="form-control text-left"  name="enc_fechaFactura" id="enc_fechaFactura" value="{{ enc.fechaFactura|date:'Y-m-d' }}"  required>
+                         </div>
+                       {% endif %}
+                      </div>
+                      
+                      
+
+
+                      <div class="row" p-2>
+                        <div class="col-lg-5  text-left">
+                           Expedida por:
+                        </div>
+                       {% if enc.expedidaFactura %}
+                          {{ enc.expedidaFactura }}
+                       {% else %}
+                          <div class="col-lg-6">
+                             <input type="text"  class="form-control text-left"  name="enc_expedidaFactura" id="enc_expedidaFactura" value="{{ enc.expedidaFactura }}"  required>
+                         </div>
+                       {% endif %}
+                      </div>
+                      
+                      <div class="row" p-2>
+                        <div class="col-lg-5  text-left">
+                           Tarjeta de circulación:
+                        </div>
+                       {% if enc.tarjetaVehiculo %}
+                          {{ enc.tarjetaVehiculo }}
+                       {% else %}
+                          <div class="col-lg-6">
+                             <input type="text"  class="form-control text-left"  name="enc_tarjetaVehiculo" id="enc_tarjetaVehiculo" value="{{ enc.tarjetaVehiculo }}"  required>
+                         </div>
+                       {% endif %}
+                      </div>
+
+                      <div class="row" p-2>
+                        <div class="col-lg-5  text-left">
+                           Fecha de la Tarjeta:
+                        </div>
+                       {% if enc.fechaTarjeta %}
+                              {{ enc.fechaTarjeta|date:'Y-m-d' }}  
+                       {% else %}
+                          <div class="col-lg-6">
+                             <input type="text"  class="form-control text-left"  name="enc_fechaTarjeta" id="enc_fechaTarjeta" value="{{ enc.fechaTarjeta|date:'Y-m-d' }}"  required>
+                         </div>
+                       {% endif %}
+                      </div>
+
+                      <div class="row" p-2>
+                        <div class="col-lg-5  text-left">
+                           Expedida por:
+                        </div>
+                       {% if enc.expedidaTarjeta %}
+                          {{ enc.expedidaTarjeta }}
+                       {% else %}
+                          <div class="col-lg-6">
+                             <input type="text"  class="form-control text-left"  name="enc_expedidaTarjeta" id="enc_expedidaTarjeta" value="{{ enc.expedidaTarjeta }}"  required>
+                         </div>
+                       {% endif %}
+                      </div>
+
+                      <div class="row" p-2>
+                        <div class="col-lg-5  text-left">
+                           Póliza de seguro:
+                        </div>
+                       {% if enc.polizaVehiculo %}
+                          {{ enc.polizaVehiculo }}
+                       {% else %}
+                          <div class="col-lg-6">
+                             <input type="text"  class="form-control text-left"  name="enc_polizaVehiculo" id="enc_polizaVehiculo" value="{{ enc.polizaVehiculo }}"  required>
+                         </div>
+                       {% endif %}
+                      </div>
+
+                      <div class="row" p-2>
+                        <div class="col-lg-5  text-left">
+                           Fecha de vigencia:
+                        </div>
+                       {% if enc.fechaPoliza %}
+                              {{ enc.fechaTarjeta|date:'Y-m-d' }}  
+                       {% else %}
+                          <div class="col-lg-6">
+                             <input type="text"  class="form-control text-left"  name="enc_fechaPoliza" id="enc_fechaPoliza" value="{{ enc.fechaPoliza|date:'Y-m-d' }}"  required>
+                         </div>
+                       {% endif %}
+                      </div>
+
+                      <div class="row" p-2>
+                        <div class="col-lg-5  text-left">
+                           Expedida por:
+                        </div>
+                       {% if enc.expedidaPoliza %}
+                          {{ enc.expedidaPoliza }}
+                       {% else %}
+                          <div class="col-lg-6">
+                             <input type="text"  class="form-control text-left"  name="enc_expedidaPoliza" id="enc_expedidaPoliza" value="{{ enc.expedidaPoliza }}"  required>
+                         </div>
+                       {% endif %}
+                      </div>
+
+
+                    {% endif %}
+          
+          
+                    {% if tipocont.id != 14 and tipocont.id != 10 and tipocont.id != 8 and tipocont.id != 4 and tipocont.id != 5  and tipocont.id != 13 %}
+                    <div class="row" p-2>    
+                         
+                        <div class="col-lg-7  text-left">
+                               Fecha del fin del contrato:
+                               
+                        </div>
+                        {% comment %} {{ enc.datecontrato_fin  }} {% endcomment %}
+                        {% if enc.datecontrato_fin %}
+                        <div class="col-lg-5 form-group" >
+                                   {{ enc.datecontrato_fin|date:'Y-m-d' }}
+                        </div>
+                      {% else %}
+                        <div class="col-lg-5" >
+                            <input type="text" style="width: 8rem;" name="enc_datecontrato_fin" id="enc_datecontrato_fin" placeholder="Fecha final" class="form-control form-control-user text-center" value="{{ enc.datecontrato_fin|date:'Y-m-d' }}" required>
+                        </div>
+                      {% endif %}
+                    </div>   
+          {% endif %}
+
+                    {% if tipocont.id != 13 %} 
+                     <div class="row" p-2>
+
+                        <div class="col-lg-6  text-left">
+                               Importe del contrato:
+                               
+                        </div>
+                      {% if enc.importeContrato %}
+                        {{ enc.importeContrato.amount}}
+                      {% else %}
+                        <div class="col-lg-5">
+                            {% comment %} <input type="float"  class="form-control text-right" name="enc_importeContrato" id="enc_importeContrato" value="{{ enc.importeContrato }}" required> {% endcomment %}
+                            <input type="float"  class="form-control text-right" name="enc_importeContrato" id="enc_importeContrato" value="{{ "0.00" }}" required>
+                          </div>
+                      {% endif %}
+                    </div> 
+                    {% endif %}
+           
+           
+           
+           
+                    {% if tipocont.id == 2 or tipocont.id == 3 or tipocont.id == 1 or tipocont.id == 11 %}         
+                    <div class="row" p-2>
+
+                        <div class="col-lg-6  text-left">
+                               Número de pagos:
+                               
+                        </div>
+                       {% if enc.npContrato > 1 %}
+                          {{ enc.npContrato }}
+                       {% else %}
+                        <div class="col-lg-4">
+                            <input type="number"  class="form-control text-right"  name="enc_npContrato" id="enc_npContrato" value="{{ enc.npContrato }}"  required>
+                        </div>
+                      {% endif %}
+                    </div>  
+
+                       <div class="row" p-2>
+
+                        <div class="col-lg-6  text-left">
+                               Importe por pago:
+                               
+                        </div>
+                      {% if enc.imppContrato %}
+                          {{ enc.imppContrato.amount }}
+                      {% else %}
+                        <div class="col-lg-5">
+                            <input type="float"  class="form-control text-right"  name="enc_imppContrato" id="enc_imppContrato"  value="{{ "0.00" }}"  required>
+                        </div>
+                      {%endif%}
+                    </div>  
+            {% endif %}
+                    
+            {% if tipocont.id != 13 %}
+                    <div class="row" p-2>
+
+                        <div class="col-lg-6  text-left">
+                               Total de horas:
+                        </div>
+                       {% if enc.totalhorasContrato %}
+                            {{ enc.totalhorasContrato }}
+                       {% else %}
+                        <div class="col-lg-4">
+                            <input type="number"  class="form-control text-right"  name="enc_totalhorasContrato" id="enc_totalhorasContrato" value="{{ enc.totalhorasContrato }}" required>
+                        </div>
+                       {% endif %}
+                    </div>
+            {% endif %}          
+
+                    <div class="row">  
+                            <div class="col-lg-3  text-left">
+                               Testigo 1:
+                            </div>
+                            
+                            
+                            {% if enc.id %}
+                              {{ enc.testigoContrato1 }}                               
+                            {% else %}
+                              <div class="col-lg-8 form-group">
+                                  <input type="text"  name="enc_testigoContrato1" id="enc_testigoContrato1" class="form-control form-control-user  pl-0 text-left " value = "{{ enc.testigoContrato1 }}" required >
+                              </div>
+                            {% endif %}
+                    
+                    </div>
+                    <div class="row">  
+                            <div class="col-lg-3  text-left">
+                               Testigo 2:
+                            </div>
+                            {% if enc.id %}
+                              {{ enc.testigoContrato2 }}
+                            {% else %}
+                              <div class="col-lg-8 form-group">
+                                  <input type="text"  name="enc_testigoContrato2" id="enc_testigoContrato2" class="form-control form-control-user  pl-0 text-left " value = "{{ enc.testigoContrato2 }}" required >
+                              </div>
+                            {% endif %}
+                    </div>
+                    
+                    
+                        <hr>
+                      
+                        
+                     
+                    {% comment %} <button type="button" class="btn btn-primary" onclick="gracont({{enc.id}})">Enviar</button>
+                     {% endcomment %}
+            <!-- Modal -->            
+                        <div class="row p-2">
+                            
+                            {% if enc.fcap == null and enc.rcap == enc.current_user  and enc.uc_id == enc.current_user  %}
+                                
+                                
+
+                                {% comment %} <button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModalCentered">
+                                         Fin de proceso de CAPtura 
+                                </button> {% endcomment %}
+                                
+                    
+                                <div class="modal" id="exampleModalCentered" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                          <h5 class="modal-title" id="exampleModalCenteredLabel">Transferir al siguiente proceso</h5>
+                                           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            {% if   enc.astep1 == "DIE" %}  
+                                              <p class="m-0 font-weight-bold text-primary"> Firma electrónica y enviar a--> {{ enc.astep1 }} Dirección de Escuela ?</p>
+                                            {% endif %}
+                                            {% if   enc.astep1 == "DIC" %}  
+                                              <p class="m-0 font-weight-bold text-primary"> Firma electrónica y enviar a--> {{ enc.astep1 }} Dirección de Campus ?</p>
+                                            {% endif %}
+                                        </div>
+                                           
+                                        <div class="modal-footer">
+                                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                          
+                                          <button type="button" class="btn btn-primary" onclick="avanza({{enc.id}})">Enviar</button>
+                                       
+                                            
+                                        </div>
+                                      </div>
+                                    </div>
+                                </div>
+                            {% else %}
+                                {% if enc.fstep1 == null and enc.rstep1 == user.id and enc.importeContrato and enc.uc_id == enc.devuelto_por %}
+                                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModalCentered">
+                                         Fin de proceso de {{ enc.astep1 }} 
+                                </button>
+                                  
+                                <!-- Modal -->
+                                <div class="modal" id="exampleModalCentered" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                          <h5 class="modal-title" id="exampleModalCenteredLabel">Transferir al siguiente proceso</h5>
+                                           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            {% if   enc.astep2 == "DIE" %}  
+                                              <p class="m-0 font-weight-bold text-primary"> Firma electrónica y enviar a--> {{ enc.astep2 }} Dirección de Escuela ?</p>
+                                            {% endif %}
+                                            {% if   enc.astep2 == "DIC" %}  
+                                              <p class="m-0 font-weight-bold text-primary"> Firma electrónica y enviar a--> {{ enc.astep2 }} Dirección de Campus ?</p>
+                                            {% endif %}
+                                            
+                                        </div>
+                                        <div class="modal-footer">
+                                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                          
+                                          <button type="button" class="btn btn-primary" onclick="avanza({{enc.id}})">Enviar</button>
+                                           
+                                        {% if enc.astep1 == "REV" or  enc.astep1 == "DIE" or  enc.astep1 == "DIC" %}                               
+                                           <button type="button" class="btn btn-danger" onclick="devuelve({{enc.id}})">Devolver</button> 
+                                        {% endif %}
+                                              
+                                        </div>
+                                       
+                                      </div>
+                                    </div>
+                                </div>
+                                {% else %}
+                                    {% if enc.fstep2 == null and enc.rstep2 == user.id and enc.fstep1 != null and enc.uc_id == enc.devuelto_por %}
+                                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModalCentered">
+                                         Fin de proceso de {{ enc.astep2 }} 
+                                </button>
+                                  
+                                <!-- Modal -->
+                                <div class="modal" id="exampleModalCentered" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                          <h5 class="modal-title" id="exampleModalCenteredLabel">Transferir al siguiente proceso</h5>
+                                           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            
+                                          {% if   enc.astep3 == "REV" %}  
+                                              <p class="m-0 font-weight-bold text-primary"> Firma electrónica y enviar a--> {{ enc.astep3 }} Jurídico Contabilidad ?</p>
+                                            {% endif %}
+                                            {% if   enc.astep3 == "DIC" %}  
+                                              <p class="m-0 font-weight-bold text-primary"> Firma electrónica y enviar a--> {{ enc.astep3 }} Dirección de Campus ?</p>
+                                            {% endif %}
+                                            
+                                        </div>
+                                        <div class="modal-footer">
+                                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                          
+                                          <button type="button" class="btn btn-primary" onclick="avanza({{enc.id}})">Enviar</button>
+                                           
+                                           {% if enc.astep2 == "REV" or  enc.astep2 == "DIE" or  enc.astep2 == "DIC" %}                               
+                                           
+                                           <button type="button" class="btn btn-danger" onclick="devuelve({{enc.id}})">Devolver</button> 
+                                            
+                                            {% endif %}  
+                                        </div>
+                                      </div>
+                                    </div>
+                                </div>
+                                    {% else %}
+                                        {% if enc.fstep3 == null and enc.rstep3 == user.id  and enc.fstep2 != null and enc.uc_id == enc.devuelto_por %}
+                                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModalCentered">
+                                         Fin de proceso de {{ enc.astep3 }} 
+                                </button>
+                                  
+                                <!-- Modal -->
+                                <div class="modal" id="exampleModalCentered" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                          <h5 class="modal-title" id="exampleModalCenteredLabel">Transferir al siguiente proceso</h5>
+                                           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            
+                                          {% if   enc.astep4 == "REV" %}  
+                                              <p class="m-0 font-weight-bold text-primary"> Firma electrónica y enviar a--> {{ enc.astep3 }} Jurídico Contabilidad ?</p>
+                                            {% endif %}
+                                            {% if   enc.astep4 == "REH" %}  
+                                              <p class="m-0 font-weight-bold text-primary"> Firma electrónica y enviar a--> {{ enc.astep4 }} Recursos Humanos ?</p>
+                                            {% endif %}
+                                            
+                                        </div>
+                                        <div class="modal-footer">
+                                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                          
+                                          <button type="button" class="btn btn-primary" onclick="avanza({{enc.id}})">Enviar</button>
+                                        
+                                        {% if enc.astep3 == "REV" or  enc.astep3 == "AUT"  %}                               
+                                           
+                                           <button type="button" class="btn btn-danger" onclick="devuelve({{enc.id}})">Devolver</button> 
+                                            
+                                            {% endif %}  
+                                        </div>
+                                      </div>
+                                    </div>
+                                </div>
+                                       {% else %}
+                                            {% if enc.fstep4 == null and enc.rstep4 == user.id and enc.fstep3 != null and enc.uc_id == enc.devuelto_por  %}
+                                           <button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModalCentered">
+                                         Fin de proceso de {{ enc.astep4 }} 
+                                </button>
+                                  
+                                <!-- Modal -->
+                                <div class="modal" id="exampleModalCentered" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                          <h5 class="modal-title" id="exampleModalCenteredLabel">Transferir al siguiente proceso</h5>
+                                           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            
+                                          <p class="m-0 font-weight-bold text-primary"> Firma electrónica y enviar a--> {{ enc.astep5 }} ?</p>
+                                            
+                                        </div>
+                                        <div class="modal-footer">
+                                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                          
+                                          <button type="button" class="btn btn-primary" onclick="avanza({{enc.id}})">Enviar</button>
+                                        </div>
+                                      {% if enc.astep4 == "REV" or  enc.astep4 == "AUT"  %}                               
+                                           
+                                           <button type="button" class="btn btn-danger" onclick="devuelve({{enc.id}})">Devolver</button> 
+                                            
+                                            {% endif %}  
+                                      
+                                      
+                                      </div>
+                                    </div>
+                                </div>        
+                                             {% else %}
+                                                {% if enc.fstep5 == null and enc.rstep5 == user.id and enc.imp_total and enc.fstep4 != null and enc.uc_id == enc.devuelto_por  %}
+                                         
+                                           <button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModalCentered">
+                                         Fin de proceso de {{ enc.astep5 }} 
+                                </button>
+                                  
+                                <!-- Modal -->
+                                <div class="modal" id="exampleModalCentered" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                          <h5 class="modal-title" id="exampleModalCenteredLabel">Transferir al siguiente proceso</h5>
+                                           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            
+                                          <p class="m-0 font-weight-bold text-primary"> Firma electrónica y enviar a--> {{ enc.astep6 }} ?</p>
+                                            
+                                        </div>
+                                        <div class="modal-footer">
+                                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                          
+                                          <button type="button" class="btn btn-primary" onclick="avanza({{enc.id}})">Enviar</button>
+                                       
+                                        {% if enc.astep5 == "REV" or  enc.astep5 == "AUT"  %}                               
+                                           
+                                           <button type="button" class="btn btn-danger" onclick="devuelve({{enc.id}})">Devolver</button> 
+                                            
+                                            {% endif %}  
+                                        
+                                        </div>
+                                      </div>
+                                    </div>
+                                </div>        
+
+                                                {% else %}
+                                                     {% if enc.fstep6 == null and enc.rstep6 == user.id and enc.imp_total and enc.fstep5 != null and enc.uc_id == enc.devuelto_por %}
+                                           <button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModalCentered">
+                                         Fin de proceso de {{ enc.astep6 }} 
+                                </button>
+                                  
+                                <!-- Modal -->
+                                <div class="modal" id="exampleModalCentered" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                          <h5 class="modal-title" id="exampleModalCenteredLabel">Transferir al siguiente proceso</h5>
+                                           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            
+                                          <p class="m-0 font-weight-bold text-primary"> Firma electrónica FIN de trámite--> {{ enc.astep6 }} ?</p>
+                                            
+                                        </div>
+                                        <div class="modal-footer">
+                                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                          
+                                          <button type="button" class="btn btn-primary" onclick="avanza({{enc.id}})">Enviar</button>
+                                       
+                                        
+                                        
+                                        </div>
+                                      </div>
+                                    </div>
+                                </div>         
+                                                
+                                                
+                                                {% endif %}
+                                             {% endif %}
+                                          {% endif %}  
+                                       {% endif %}
+                                    {% endif %}
+                                {% endif %}
+                            {% endif %}
+                                 
+
+                        </div>
+                    </div>
+                </div>
+                <!-- Fin Sección Izquierda -->
+
+        
+                <!-- Sección Derecha -->
+                <div class="col-lg-6 from-group bg-info ">
+                    
+                    <div class="row">
+                        {% if enc.status == "CAP" %}   
+                        <div class="col-lg-12 text-center text-white badge-success ">
+                               SUBIR DOCUMENTOS **OPCIONAL**
+                        </div>
+                        
+                        
+                        {% endif  %}   
+                    </div>
+                    <hr>
+                    <div class="row" pt-2>    
+                            <div class="col-lg-10 form-group" pt-2 >
+                                <select name="documento" id="documento" class="form-control">
+                                    <option value="0">Buscar</option>
+                                    {% for item in  requi %}
+                                        <option value="{{item.id}}">{{ item.requisito }} </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                    </div>
+                    <div class="row" p-2>    
+                     
+                        <div class="col-lg-5  text-left text-white">
+                               Fecha de caducidad:
+                               
+                        </div>
+                        
+                        <div class="col-lg-7" >
+                            <input type="text" style="width: 8rem;" name="enc_vigenciaFinDocto" id="enc_vigenciaFinDocto" placeholder="Caducidad" class="form-control form-control-user text-center"  >
+                        </div>
+                        
+                    </div>
+                    <hr>
+                    <div class="row">
+                            <div class="col-lg-12">
+                                <textarea class="form-control" name="comentarioDocto" id="comentarioDocto" rows ="4"  placeholder="Comentarios del documento "></textarea>
+                            </div>
+                    </div>
+                    
+                   <hr>
+                        <div class="row">
+                            <div class="col-lg-12" pb-4 >
+                            
+                                  <input type="file" id="archivoInput" name="pdf" onchange="validarExt()" >
+                                  <div id="visorArchivo">
+
+                                  </div >
+                                  <button type="submit" id="bEnviar"  >Guardar</button>
+                                  {% if url %}
+                                    <p>Uploaded file: <a href="{{ url }}">{{ url }}</a></p>
+                                  {% endif %}
+                                
+                           </div>
+                        </div>
+                    
+                    
+                    
+                        
+                                        
+                    
+                    
+                    <hr>
+                    
+                    
+                </div>
+        
+                <!-- Fin Sección Derecha -->
+            </div>
+            <!-- Fin Sección Superior -->
+            <!-- Inicio Detalle -->
+            <hr>
+            <div class="row p-1">
+                <div>
+                    <table
+                        id="table"
+                        class="table table-sm"
+                        data-toggle="table"
+                        data-pagination="true"
+                        data-search="true"
+                        data-show-columns="true"
+                        data-show-toggle="true"
+                        data-show-fullscreen="true"
+                        data-toolbar=".buttons-toolbar"
+                        data-locale="es-MX"
+                        >
+                        <thead>
+                            <th data-field="pdf">Imagen</th>
+                            <th data-sortable="true" data-field="documento">Documento</th>      
+                            <th data-sortable="true" data-field="vigenciaFinDocto">Caducidad-</th>
+                            <th data-sortable="true" data-field="comentarioDocto&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;">Comentarios</>
+                            <th class="all" >Editar</th>
+                            <th class="all" >Eliminar</th>    
+                           
+                             
+                           
+                        </thead>
+                        <tbody>
+                            {% for item in det%}
+                           
+                            <tr>
+                                <td>
+                                <iframe src="{{ item.pdf.url }}" width="700" height="500"  style="border:1px solid black;" allowfullscreen>
+                                </iframe>
+                                
+                                
+                                </td>
+                                
+                                <td>{{ item.documento }}</td>
+                                <td>{{ item.vigenciaFinDocto|date:'Y-M-d' }}</td>
+                          
+                                <td>{{ item.comentarioDocto }}</td>
+                            
+                               
+                               
+                                <td>
+                                    <button class="btn btn-warning btn-circle" onclick="return abrir_modal('{% url 'cto:doctos_edit' item.id%}')"><i class="far fa-edit"></i></button>
+                                </td>
+                               
+                                <td>
+                                    <button class="btn btn-danger btn-circle" onclick="return abrir_modal('{% url 'cto:doctos_del' item.id item.id %}')">
+                                       <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
+                                 
+                                 
+                                
+                                
+                           
+                            </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- Fin Detalle -->
+        </div>
+    </div>
+</div>
+</form>
+{% endblock %}
+{% block js_page %}
+
+
+<script>
+  window.onload = function() {
+    habilitarTextarea();
+  }
+</script>
+
+
+
+<script>
+    $(document).ready(function(){
+        $("#bEnviar").click(function(){
+           var nombre = $("#enc_nombreParte").val();
+           var docu = $("#documento").val();
+           var impo = $("#enc_importeContrato").val();
+           var fec = $("#enc_datecontrato_ini").val();
+           var nh = $("#enc_totalhorasContrato").val();
+           var xpdf = $("#pdf").val();
+           
+           
+           if(nombre == "" ){
+              Swal.fire({
+	              title: "Seleccione el sujeto del contrato",
+	              icon: "warning",
+                width: "30%"
+              });
+              return false;
+           }
+
+           if(fec == "" ){
+              Swal.fire({
+	              title: "Seleccione la fecha de inicio del contrato",
+	              icon: "warning",
+                width: "30%"
+              });
+              return false;
+           }
+           
+           if(impo == 0 ){
+              Swal.fire({
+	              title: "Porporcione el importe del contrato",
+	              icon: "warning",
+                width: "30%"
+              });
+              return false;
+           }
+
+           if(nh == "" ){
+              Swal.fire({
+	              title: "Porporcione el número de horas",
+	              icon: "warning",
+                width: "30%"
+              });
+              return false;
+           }
+
+           if(docu == 0 ){
+              Swal.fire({
+	              title: "Seleccione un documento",
+	              icon: "warning",
+                width: "30%"
+              });
+              return false;
+           }
+
+                      
+        });
+        
+       
+    
+      });
+</script>
+
+
+<script>
+     
+    
+    $(function () {
+        
+            
+        
+        $("#enc_datecontrato_ini").datetimepicker({
+            format: 'Y-m-d',
+            timepicker:false
+        });
+
+        $("#enc_datecontrato_fin").datetimepicker({
+            format: 'Y-m-d',
+            timepicker:false
+        });
+
+        $("#enc_fechaFactura").datetimepicker({
+          format: 'Y-m-d',
+          timepicker:false
+        });
+
+        $("#enc_fechaTarjeta").datetimepicker({
+          format: 'Y-m-d',
+          timepicker:false
+        });
+
+        $("#enc_fechaPoliza").datetimepicker({
+          format: 'Y-m-d',
+          timepicker:false
+        });
+       
+        $("#enc_vigenciaFinDocto").datetimepicker({
+            format: 'Y-m-d',
+            timepicker:false
+        });
+        $("#sidebarToggle").click();
+        
+        $('#enc_nombreParte').select2({
+            selectOnBlur: true,
+            placeholder: "Seleccione el Sujeto del contrato",
+            allowClear: true,
+            required: true,
+           
+        });
+        
+        $('#documento').select2({
+            placeholder: "Seleccione el documento",
+            allowClear: true,
+            required: true,
+        });
+        
+        // Aviso opcional de campos faltantes del Sujeto (sin obligar a completar)
+        (function(){
+          var $sel = $('#enc_nombreParte');
+          if (!$sel.length) return;
+          if ($sel.data('missing-bound')) return; // evita doble binding
+          $sel.data('missing-bound', true);
+          var alertOpen = false;
+          $sel.on('change.select2', function(){
+            var id = $(this).val();
+            if (!id || id === '0') return;
+            // Evita alertas duplicadas para el mismo valor seleccionado (set inmediato)
+            var last = $sel.data('last-checked');
+            if (last && String(last) === String(id)) return;
+            $sel.data('last-checked', id);
+            if (alertOpen) return;
+            fetch('/cto/partes/' + id + '/faltantes', {headers: {'X-Requested-With':'XMLHttpRequest'}})
+              .then(function(r){ if(!r.ok) throw new Error('request'); return r.json(); })
+              .then(function(data){
+                var missing = Array.isArray(data && data.missing) ? data.missing : [];
+                var count = data && typeof data.count === 'number' ? data.count : missing.length;
+                if (count > 0) {
+                  var items = missing.map(function(m){ return (typeof m === 'string') ? m : (m.label || m.name || m); });
+                  var html = '<ul style="text-align:left">' + items.map(function(i){return '<li>'+i+'</li>';}).join('') + '</ul>';
+                  if (window.Swal && Swal.fire) {
+                    alertOpen = true;
+                    Swal.fire({
+                      title: 'Faltan datos del Sujeto',
+                      html: html + '<p>¿Deseas completar ahora?</p>',
+                      icon: 'warning',
+                      showCancelButton: true,
+                      confirmButtonText: 'Editar ahora',
+                      cancelButtonText: 'Continuar',
+                      reverseButtons: true,
+                      width: '40%'
+                    }).then(function(res){
+                      alertOpen = false;
+                      if (res.isConfirmed) {
+                        if (typeof abrir_modal === 'function') abrir_modal('/cto/partes/' + id);
+                        else window.location.href = '/cto/partes/' + id;
+                      }
+                    });
+                  } else {
+                    var txt = 'Faltan datos del Sujeto:\n\n' + items.join('\n');
+                    if (typeof mensaje === 'function') mensaje(txt,'warning');
+                  }
+                }
+              })
+              .catch(function(){ /* silencio errores de red */ });
+          });
+        })();
+
+        
+
+
+       
+
+        
+
+       
+
+        $("#enc_id").val("{{ enc.id }}");
+        
+        $("#enc_nombreParte").val("{{ enc.nombreParte.id }}").change();
+
+        $("#documento").val("{{ det.documento.id }}").change();
+
+        $("#datecontrato_ini").val("{{ enc.datecontrato_ini|date:'Y-m-d' }}").change();
+        $("#datecontrato_fin").val("{{ enc.datecontrato_fin|date:'Y-m-d' }}").change();
+
+        $("#enc_testigoContrato1").val("{{ enc.testigoContrato1 }}").change();
+        
+        $("#enc_testigoContrato2").val("{{ enc.testigoContrato2 }}").change();
+
+        $("#empresa").val("{{ enc.empresa }}").change();
+        $("#tipo_sociedad").val("{{ enc.tipo_sociedad }}").change();
+        $("#objeto_social").val("{{ enc.objeto_social }}").change();
+        $("#rfc_sociedad").val("{{ enc.rfc_sociedad }}").change();
+        $("#testimonio").val("{{ enc.testimonio}}").change();
+
+
+        
+        $("#marcaVehiculo").val("{{ enc.marcaVehiculo }}").change();
+        $("#modeloVehiculo").val("{{ enc.modeloehiculo }}").change();
+        $("#tipoVehiculo").val("{{ enc.tipoVehiculo }}").change();
+        $("#motorVehiculo").val("{{ enc.motorVehiculo }}").change();
+        $("#serieVehiculo").val("{{ enc.serieVehiculo }}").change();
+        $("#placasVehiculo").val("{{ enc.placasVehiculo }}").change();
+        $("#facturaVehiculo").val("{{ enc.facturaVehiculo }}").change();
+        $("#tarjetaVehiculo").val("{{ enc.tarjetaVehiculo }}").change();
+        $("#polizaVehiculo").val("{{ enc.polizaVehiculo }}").change();
+
+        $("#expedidaFactura").val("{{ enc.expedidaFactura }}").change();
+        $("#expedidaTarjeta").val("{{ enc.expedidaTarjeta }}").change();
+        $("#expedidaPoliza").val("{{ enc.expedidaPoliza }}").change();
+
+
+        $("#enc_fechaFactura").val("{{ enc.fechaFactura|date:'Y-m-d' }}");
+        $("#enc_fechaTarjeta").val("{{ enc.fechaTarjeta|date:'Y-m-d' }}");
+        $("#enc_fechaPoliza").val("{{ enc.fechaPoliza|date:'Y-m-d' }}");
+
+
+
+
+
+
+
+
+
+       
+       $("#comentarioDocto").val("{{ det.comentarioDocto }}").change();
+
+
+        $("#status").val("{{ enc.status }}");
+        
+
+
+        $("#enc_datecontrato_ini").val("{{ enc.datecontrato_ini|date:'Y-m-d' }}");
+        $("#enc_datecontrato_fin").val("{{ enc.datecontrato_fin|date:'Y-m-d' }}");
+                
+        
+        $("#Folio").val("{{ det.no_facturasol }}").change();  
+
+        // Calcula automáticamente el importe por pago cuando cambian importe total o número de pagos
+        try {
+          $('#enc_importeContrato, #enc_npContrato').on('input change', calcImporte);
+          // Inicializa si ya hay valores
+          calcImporte();
+        } catch(e) { /* no-op si los campos no existen en este tipo de contrato */ }
+
+    });
+function avanza(id)
+  {
+    // Validar beneficiarios del Sujeto antes de avanzar
+    var sujetoId = $('#enc_nombreParte').val() || "{{ enc.nombreParte.id }}";
+    if (!sujetoId || sujetoId === '0' || sujetoId === 'None') {
+      mensaje('Seleccione el Sujeto del contrato','error');
+      return;
+    }
+    fetch('/cto/partes/' + sujetoId + '/faltantes', {headers: {'X-Requested-With':'XMLHttpRequest'}})
+      .then(function(resp){ if(!resp.ok) throw new Error('request'); return resp.json(); })
+      .then(function(data){
+        var missing = Array.isArray(data && data.missing) ? data.missing : [];
+        var faltaBenef = missing.some(function(m){ return (m.field||m.name||'') === 'beneficiarios'; });
+        if (faltaBenef) {
+          // Permitir continuar bajo confirmación; opción para capturar ahora abre el modal
+          return new Promise(function(resolve, reject){
+            if (window.Swal && Swal.fire) {
+              Swal.fire({
+                title: 'Beneficiarios faltantes',
+                text: 'Falta capturar al menos un beneficiario. ¿Deseas continuar y completarlo después?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Continuar',
+                cancelButtonText: 'Capturar ahora',
+                width: '40%'
+              }).then(function(res){
+                if (res.isConfirmed) {
+                  resolve();
+                } else {
+                  if (typeof abrir_modal === 'function') abrir_modal('/cto/partes/' + sujetoId);
+                  reject(new Error('stop'));
+                }
+              });
+            } else {
+              var ok = window.confirm('Faltan beneficiarios. ¿Continuar y completar después?');
+              if (ok) resolve(); else { if (typeof abrir_modal === 'function') abrir_modal('/cto/partes/' + sujetoId); reject(new Error('stop')); }
+            }
+          });
+        }
+      })
+      .then(function(){
+        Swal.fire({
+	          title: 'Enviado !',
+	          icon: 'success',
+              width: '30%'
+            });
+        var data = {id:id};
+        data = JSON.stringify(data);
+        var token = '{{csrf_token}}';
+        $.ajax({
+          headers : {"X-CSRFToken": token},
+          type:"POST",
+          url:"/cto/contratos/avanza/"+id,
+          data: data,
+          success: function(response){
+            if(response==="OK")
+            {
+               window.location.href = "/cto/contratos/";
+            }
+            else{
+              mensaje("Error Intentado Cambiar Status");
+            }
+          },
+          error: function(jqXHR, textStatus, errorThrow){
+            console.log(textStatus, errorThrow);
+            mensaje(errorThrow,'red');
+            cerrar_modal();
+          }
+        });
+      })
+  .catch(function(e){ /* si e==='stop' ya mostramos alerta y modal */ });
+  }
+function devuelve(id)
+  {
+    
+    Swal.fire({
+	              title: "Contrato devuelto !",
+	              icon: "success",
+                width: "30%"
+              });
+    var data = {id:id};
+    data = JSON.stringify(data);
+    var token = '{{csrf_token}}';
+    // alert(token);
+    // alert(id);
+    
+    $.ajax({
+      headers : {"X-CSRFToken": token},
+      type:"POST",
+      url:"/cto/contratos/devuelve/"+id,
+      data: data,
+      success: function(response){
+        if(response==="OK")
+        {
+          
+         window.location.href = "/cto/contratos/";
+          
+        }
+        else{
+          mensaje("Error Intentado Cambiar Status");
+        }
+      },
+      error: function(jqXHR, textStatus, errorThrow){
+        console.log(textStatus, errorThrow);
+        mensaje(errorThrow,'red');
+        cerrar_modal();
+      }
+    });
+  }
+// Call the dataTables jQuery plugin
+// $(document).ready(function() {
+//   $('.table').DataTable();
+// });
+
+
+function contrata(id)
+  {
+  // Contrato generado
+    var data = {id:id};
+    data = JSON.stringify(data);
+    var token = '{{csrf_token}}';
+    // alert(token);
+    // alert(id);
+    
+    $.ajax({
+      headers : {"X-CSRFToken": token},
+      type:"POST",
+      url:"/cto/contratos/contrata/"+id,
+      data: data,
+      success: function(response){
+        if(response==="OK")
+        {
+          
+         window.location.href = "/cto/contratos/";
+          
+        }
+        else{
+          mensaje("Error Intentado Imprimir contrato");
+        }
+      },
+      error: function(jqXHR, textStatus, errorThrow){
+        console.log(textStatus, errorThrow);
+        mensaje(errorThrow,'red');
+        cerrar_modal();
+      }
+    });
+  }
+// Call the dataTables jQuery plugin
+// $(document).ready(function() {
+//   $('.table').DataTable();
+// });   
+
+function gracont(id)
+  {
+    //alert("guardado ok !!");
+  
+    var data = {id:id,
+               enc_datecontrato_ini : $("input[name='enc_datecontrato_ini']").val(),
+               enc_datecontrato_fin : $("input[name='enc_datecontrato_fin']").val(),
+               enc_importeContrato : $("input[name='enc_importeContrato']").val(),
+               enc_npContrato : $("input[name='enc_npContrato']").val(),
+               enc_marcaVehiculo : $("input[name='enc_marcaVehiculo']").val(),
+               enc_modeloVehiculo : $("input[name='enc_modeloVehiculo']").val(),
+               enc_tipoVehiculo : $("input[name='enc_tipoVehiculo']").val(),
+               enc_motorVehiculo : $("input[name='enc_motorVehiculo']").val(),
+               enc_serieVehiculo : $("input[name='enc_serieVehiculo']").val(),
+               enc_placasVehiculo : $("input[name='enc_placasVehiculo']").val(),
+               
+               enc_facturaVehiculo : $("input[name='enc_facturaVehiculo']").val(),
+               enc_fechaFactura : $("input[name='encfechaFactura']").val(),
+               enc_expedidaFactura : $("input[name='enc_expedidaFactura']").val(),
+               enc_tarjetaVehiculo : $("input[name='enc_tarjetaVehiculo']").val(),
+               enc_fechaTarjeta : $("input[name='encfechaTarjeta']").val(),
+               enc_expedidaTarjeta : $("input[name='enc_expedidaTarjeta']").val(),
+               enc_polizaVehiculo : $("input[name='enc_polizaVehiculo']").val(),
+               enc_fechaPoliza : $("input[name='encfechaPoliza']").val(),
+               enc_expedidaPoliza : $("input[name='enc_expedidaPoliza']").val(),
+
+
+
+               enc_imppContrato : $("input[name='enc_imppContrato']").val(),
+               enc_totalhorasContrato : $("input[name='enc_totalhorasContrato']").val(),
+               enc_testigoContrato1 : $("input[name='enc_testigoContrato1']").val(),
+               enc_testigoContrato2 : $("input[name='enc_testigoContrato2']").val()
+                };
+    data = JSON.stringify(data);
+  // Datos preparados para guardar
+    var token = '{{csrf_token}}';
+    // alert(token);
+    // alert(id);
+    
+    $.ajax({
+      headers : {"X-CSRFToken": token},
+      type:"POST",
+      url:"/cto/contratos/gracont/"+id,
+      data: data, 
+     
+      success: function(response){
+        if(response==="OK")
+        {
+            if (window.Swal && Swal.fire) {
+              Swal.fire({
+                title: 'Guardado',
+                icon: 'success',
+                width: '30%'
+              });
+            } else if (typeof mensaje === 'function') {
+              mensaje('Guardado','success');
+            }
+        }
+        else{
+          mensaje("Error Intentado guardar");
+        }
+      },
+      error: function(jqXHR, textStatus, errorThrow){
+        console.log(textStatus, errorThrow);
+        mensaje(errorThrow,'red');
+        cerrar_modal();
+      }
+    });
+  }  
+
+</script>
+
+
+<script type="text/javascript">
+ 
+ function validarExt()
+  {
+    var archivoInput = document.getElementById('archivoInput');
+    var archivoRuta = archivoInput.value;
+    var extPermitidas = /(.pdf|.PDF|.png|.PNG|.jpg|.JPG)$/i;
+
+    if(!extPermitidas.exec(archivoRuta))
+    {
+       Swal.fire({
+	              title: "Los archivos permitidos son: PDF, JPG y PNG",
+	              icon: "warning",
+                width: "30%"
+              });
+       archivoInput.value = '';
+       return false
+    }
+  // Si se requiere previsualizar, reactivar el siguiente bloque:
+  // else {
+  //   if(archivoInput.files && archivoInput.files[0]) {
+  //     var visor = new FileReader();
+  //     visor.onload = function(e) {
+  //       document.getElementById('visorArchivo').innerHTML =
+  //         '<embed src="'+e.target.result+'" width="500" height="500">';
+  //     };
+  //     visor.readAsDataURL(archivoInput.files[0]);
+  //   }
+  // }
+  }
+</script>
+
+
+
+<script type="text/javascript">
+ 
+function calcImporte()
+ {
+    var $imp = $('#enc_importeContrato');
+    var $np = $('#enc_npContrato');
+    var $impp = $('#enc_imppContrato');
+    if (!$impp.length) return; // si no existe el campo de importe por pago, salir
+    var importe = parseFloat(($imp.val() || '0').toString().replace(/,/g,''));
+    var pagos = parseInt(($np.val() || '0'), 10);
+    if (isFinite(importe) && importe > 0 && isFinite(pagos) && pagos > 0) {
+      var porPago = importe / pagos;
+      $impp.val(porPago.toFixed(2));
+    } else {
+      $impp.val('');
+    }
+  }
+</script>
+
+
+<script type="text/javascript">
+
+
+function habilitarTextarea() {
+  var textarea = document.getElementById("enc_objeto_social");
+  if (!textarea) {
+    return; // No textarea on this view; nothing to do
+  }
+  textarea.disabled = textarea.value !== "";
+}
+</script>
+
+{% endblock %}

@@ -1,0 +1,141 @@
+<div class="modal-dialog modal-lg">
+    <div class="modal-content">
+        <!-- Formulario existente -->
+        <form role="form" action="{% if obj %}{% url 'cto:partes_edit' obj.pk %}{% else %}{% url 'cto:partes_new' %}{% endif %}" method="post" class="form-inline">
+            <!-- Contenido del formulario -->
+            <div class="col-xl-12 col-md-12 mb-12">
+                <div class="card border-left-{% if obj %}warning{% else %}success{% endif %} shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <!-- Campos del formulario -->
+                                <div class="text-xl font-weight-bold text-primary text-uppercase mb-1">
+                                    {% if obj %} Editar {% else %} Nuevo sujeto de contrato {% endif %}
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                {% csrf_token %}
+                                <div class="row">
+                                    {{ form.as_p }}
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                <div class="row">
+                                    <div class="col">
+                                        <button type="submit" class="btn btn-danger">
+                                            <span class="fa fa-save"></span> Guardar
+                                        </button>
+                                        <button type="button" class="btn btn-success modal-cancel" data-dismiss="modal">
+                                            Cancelar
+                                        </button>
+                                        <!-- Botón para imprimir el documento -->
+                                        <button type="button" class="btn btn-primary" onclick="imprimirBeneficiarios()">
+                                            <span class="fa fa-print"></span> Imprimir Beneficiarios
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+  /* Resalta campos faltantes sin bloquear el guardado */
+  .missing-field {
+    border-color: #dc3545 !important; /* rojo bootstrap */
+    box-shadow: 0 0 0 .2rem rgba(220,53,69,.25);
+  }
+  .missing-label { color: #dc3545 !important; font-weight: 600; }
+</style>
+
+<script>
+        // Enviar el formulario por AJAX para mantener el foco en la captura del contrato
+        (function(){
+            var $form = $("form[role='form']");
+            if (!$form.length) return;
+            if ($form.data('ajax-bound')) return;
+            $form.data('ajax-bound', true);
+            $form.on('submit', function(e){
+                e.preventDefault();
+                var $btn = $(this).find('button[type="submit"]');
+                $btn.prop('disabled', true);
+                $.ajax({
+                    url: this.action,
+                    type: 'POST',
+                    data: $form.serialize(),
+                    success: function(){
+                        // Cerrar modal y regresar el foco a la captura del contrato
+                        if (typeof cerrar_modal === 'function') cerrar_modal();
+                        var $sel = $('#enc_nombreParte');
+                        if ($sel.length) {
+                            // Re-disparar validación de faltantes y enfocar
+                            $sel.trigger('change');
+                            $sel.select2 ? $sel.select2('open') : $sel.focus();
+                        }
+                        // feedback opcional
+                        if (typeof mensaje === 'function') mensaje('Datos guardados','success');
+                    },
+                    error: function(){
+                        if (typeof mensaje === 'function') mensaje('Error al guardar','error');
+                    },
+                    complete: function(){
+                        $btn.prop('disabled', false);
+                    }
+                });
+            });
+        })();
+
+        // Resaltar campos faltantes obtenidos desde /cto/partes/<id>/faltantes
+        (function(){
+            var parteId = "{{ obj.pk|default:'' }}";
+            if (!parteId) return;
+            try {
+                fetch('/cto/partes/' + parteId + '/faltantes', {headers: {'X-Requested-With':'XMLHttpRequest'}})
+                  .then(function(r){ if(!r.ok) throw new Error('request'); return r.json(); })
+                  .then(function(data){
+                      var missing = Array.isArray(data && data.missing) ? data.missing : [];
+                      if (!missing.length) return;
+                      missing.forEach(function(m){
+                          var key = (m && (m.field || m.name)) ? (m.field || m.name) : null;
+                          var label = (m && (m.label || m.name)) ? (m.label || m.name) : '';
+                          if (!key) return;
+                          // Busca por name o id convencional de Django (id_<field>)
+                          var $input = $("[name='"+key+"']");
+                          if (!$input.length) { $input = $("#id_"+key); }
+                          if (!$input.length) { $input = $("[name$='."+key+"']"); }
+                          if ($input.length) {
+                              $input.addClass('missing-field');
+                              var id = $input.attr('id');
+                              if (id) { $("label[for='"+id+"']").addClass('missing-label'); }
+                              // Limpia el resaltado cuando el usuario captura un valor
+                              $input.on('input change', function(){
+                                  var v = (this.value||'').toString().trim();
+                                  if (v) {
+                                      $(this).removeClass('missing-field');
+                                      var lid = $(this).attr('id');
+                                      if (lid) $("label[for='"+lid+"']").removeClass('missing-label');
+                                  }
+                              });
+                          }
+                      });
+                  })
+                  .catch(function(){ /* silencio */ });
+            } catch(e) { /* silencio */ }
+        })();
+
+    function imprimirBeneficiarios() {
+        // Obtener el ID de la parte registrada
+        const parteId = "{{ obj.pk }}";  // Asegúrate de que `obj` esté disponible en el contexto
+
+        // Verificar si el ID de la parte es válido
+        if (parteId) {
+            // Redirigir a la vista que genera el documento
+            window.location.href = `/cto/partes/${parteId}/beneficiarios/`;
+        } else {
+            // Mostrar un mensaje de error si no hay un ID válido
+            alert("No se ha seleccionado una parte válida. Guarda los datos antes de imprimir.");
+        }
+    }
+</script>

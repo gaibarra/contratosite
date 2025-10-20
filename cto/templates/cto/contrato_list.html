@@ -1,0 +1,129 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% load formatags %}
+{% load djmoney %}
+
+
+
+{% block top_bar %}
+  <div class="page-title-bar">
+    <div class="page-title"><i class="fas fa-file-contract"></i>
+      {% for x in some_data3 %}{% if x.marcatipoContrato %}{{ x.tipoContrato }}{% endif %}{% endfor %}
+    </div>
+    <div class="page-sub">
+      <span class="chip"><i class="fas fa-user"></i> {{ user.username }} {{ user.last_name }} {{ user.first_name }}</span>
+      {% for x in some_data %}{% if x.user_id == user.id %}<span class="chip"><i class="fas fa-building"></i> {{ x.claveDepartamento }}</span>{% endif %}{% endfor %}
+    </div>
+  </div>
+{% endblock top_bar %}
+
+
+
+
+{% block page_content %}
+<div class="card shadow mb-4">
+  <!-- Card Header - Dropdown -->
+  <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+
+    {% for item in obj %}
+
+    {% for x in some_data %}
+    {% if x.user_id == item.astep1 %}
+    <a class="btn btn-secondary" href="{% url 'cto:departamento_list' %}"><i cass="far fa-calendar-plus"></i>REV
+      {{x.usuario}}</a>
+    {% endif %}
+    {% endfor %}
+
+    {% endfor %}
+
+
+    <!-- <div class="dropdown no-arrow">
+      <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+      </a>
+      <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+        <div class="dropdown-header">Acciones:</div>
+        <a class="dropdown-item" onclick="return abrir_modal('{% url 'cto:departamento_list' %}')" href="#"><i class="far fa-calendar-plus"></i> Nuevo</a>
+      </div>
+    </div> -->
+  </div>
+  <!-- Card Body -->
+  <div class="card-body">
+    {% if not obj %}
+    <div class="alert alert-info">No Hay Contratos</div>
+    {% endif %}
+    <div class="buttons-toolbar">
+      <a class="btn btn-danger" href="{% url 'cto:contrato_new' %}"><i cass="far fa-calendar-plus"></i>Nuevo
+        Contrato</a>
+
+    </div>
+
+
+    <table id="table" data-toggle="table" data-pagination="true" data-search="true" data-show-columns="true"
+      data-show-toggle="true" data-show-fullscreen="true" data-toolbar=".buttons-toolbar" data-locale="es-MX">
+      <thead>
+        <th data-sortable="true" data-field="id">Folio&nbsp;&nbsp;</th>
+        <th data-sortable="true" data-field="tipocontrato">Tipo de Contrato</th>
+        <th data-sortable="true" data-field="status">Status&nbsp;&nbsp;</th>
+
+        <th data-sortable="true" data-field="datecontrato">Fecha</th>
+        <th data-sortable="true" data-field="parte2">Sujeto del contrato</th>
+        <th data-sortable="true" data-field="importeContrato">Importe</th>
+
+        <th class="all">Contrato</th>
+
+
+        <th class="all">Modificar</th>
+
+      </thead>
+
+      <tbody>
+        {% for item in obj %}
+
+
+        <tr>
+          <td>{{ item.id}}</td>
+
+
+          <td>{{ item.tipocontrato }}</td>
+          <td>{{ item.status }}</td>
+          <td>{{ item.datecontrato|date:'d-M-Y' }}</td>
+          <td>{{ item.parte2 }}</td>
+          <td>{{ item.importeContrato.amount }}</td>
+          
+          <td>
+            <a href="{% url 'cto:contrato_edit' item.id %}" class="href btn btn-success btn-circle">
+              <i class="far fa-edit"></i>
+            </a>
+          </td>
+          <td>
+            {% if item.status == "CAP" %}
+            <button class="btn btn-warning btn-circle" data-open-modal-url="{% url 'cto:contrato_edit2' item.id %}">
+              <i class="far fa-edit"></i>
+            </button>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+
+    </table>
+  </div>
+</div>
+{% endblock %}
+{% block js_page %}
+ <script>
+  // Delegated handler to open modal without inline JS (avoids linter errors)
+  (function(){
+    document.addEventListener('click', function(e){
+      var btn = e.target && e.target.closest('[data-open-modal-url]');
+      if (!btn) return;
+      e.preventDefault();
+      var url = btn.getAttribute('data-open-modal-url');
+      if (url) {
+        if (typeof abrir_modal === 'function') abrir_modal(url); else window.location.href = url;
+      }
+    }, false);
+  })();
+ </script>
+{% endblock js_page %}
