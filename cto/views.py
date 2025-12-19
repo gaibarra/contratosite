@@ -466,6 +466,13 @@ def contratos2(request, contrato_id=None):
         # print(xUsuario2)
         partes = Partes.objects.filter(estado=True, usuario=xUsuario)
         p = partes.first()
+        # Fallback: algunos usuarios no tienen vinculado el OneToOne o el campo 'usuario'
+        if not p:
+            partes = Partes.objects.filter(estado=True, user_id=xUsuario2)
+            p = partes.first()
+        if not p:
+            messages.error(request, 'No se encontró un "Sujeto de contrato" asociado a tu usuario. Asigna tu usuario en Catálogo > Partes.')
+            return HttpResponseRedirect('/cto/contratos/')
         #print (p)
         dx = p.claveDepartamento_id
 
@@ -483,14 +490,24 @@ def contratos2(request, contrato_id=None):
     
 
     d2 = departamentos.first()
+    if not d2:
+        messages.error(request, f'Departamento no encontrado para la clave "{dx}". Verifica el catálogo de Departamentos y la clave en tu registro de Sujeto.')
+        return HttpResponseRedirect('/cto/contratos/')
    
     d3 = (d2.claveDepartamento)
     #print(d3)
     #r1 = (d2.rango1)
     #r2 = (d2.rango2)
 
-    r1 = str(d2.rango1)
-    r2 = str(d2.rango2)
+    # Asegurar padding (comparación lexicográfica consistente contra claves de 3 dígitos con ceros a la izquierda)
+    try:
+        r1 = f"{int(d2.rango1):03d}" if d2.rango1 is not None else "000"
+    except Exception:
+        r1 = "000"
+    try:
+        r2 = f"{int(d2.rango2):03d}" if d2.rango2 is not None else "999"
+    except Exception:
+        r2 = "999"
 
     #print(d2.rango1)
     #print(d2.rango2)
@@ -559,20 +576,25 @@ def contratos2(request, contrato_id=None):
         r3 = int(secuencia[16:21])
         f3 = secuencia[21:24]
 
+        # Elegir el responsable (DIC) desde la secuencia
+        dic_user_id = None
         if f1 == 'DIC':
-            funcionario = Partes.objects.filter(user_id=r1)
-        else:
-            if f2 == 'DIC':
-                funcionario = Partes.objects.filter(user_id=r2)
-            else:
-                if f3 == 'DIC':
-                    funcionario = Partes.objects.filter(user_id=r3)
-        # print(funcionario)
+            dic_user_id = r1
+        elif f2 == 'DIC':
+            dic_user_id = r2
+        elif f3 == 'DIC':
+            dic_user_id = r3
 
+        if dic_user_id is None:
+            messages.error(request, 'Secuencia administrativa inválida: no se encontró responsable DIC (f1/f2/f3).')
+            return HttpResponseRedirect('/cto/contratos/')
+
+        funcionario = Partes.objects.filter(user_id=dic_user_id)
         a2 = funcionario.first()
-        # print(a2)
-        a3 = (a2.id)
-        #print (a3)
+        if not a2:
+            messages.error(request, 'Secuencia administrativa inválida: el usuario DIC no está dado de alta en Partes.')
+            return HttpResponseRedirect('/cto/contratos/')
+        a3 = a2.id
         fun = Partes.objects.get(pk=a3)
 
         r4 = int(secuencia[24:29])
@@ -1085,17 +1107,22 @@ def coverletter_export(request, id):
     # print(secue)
     # Régimen fiscal del contratado
     departamento = Departamento.objects.filter(claveDepartamento=partes.claveDepartamento_id).first()
-    print(int(departamento.claveDepartamento))
-    if (int(departamento.claveDepartamento))<100:
+    # Determinar campus por rango de clave de departamento (robusto ante valores no numéricos)
+    try:
+        dept_num = int(departamento.claveDepartamento) if departamento and departamento.claveDepartamento else None
+    except Exception:
+        dept_num = None
+
+    if dept_num is not None and dept_num < 100:
         campus=Campus.objects.filter(pk=2).first()
 
-    if (int(departamento.claveDepartamento))<300 and (int(departamento.claveDepartamento))>99:
+    if dept_num is not None and dept_num < 300 and dept_num > 99:
         campus=Campus.objects.filter(pk=3).first()
 
-    if (int(departamento.claveDepartamento))<500 and (int(departamento.claveDepartamento))>299:
+    if dept_num is not None and dept_num < 500 and dept_num > 299:
         campus=Campus.objects.filter(pk=4).first()
 
-    if (int(departamento.claveDepartamento))<700 and (int(departamento.claveDepartamento))>499:
+    if dept_num is not None and dept_num < 700 and dept_num > 499:
         campus=Campus.objects.filter(pk=5).first()
 
     # print(campus.direccionCampus)

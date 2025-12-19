@@ -12,7 +12,11 @@
     </div>
     <div class="page-sub">
       <span class="chip"><i class="fas fa-user"></i> {{ user.username }} {{ user.last_name }} {{ user.first_name }}</span>
-      {% for x in some_data %}{% if x.user_id == user.id %}<span class="chip"><i class="fas fa-building"></i> {{ x.claveDepartamento }}</span>{% endif %}{% endfor %}
+      {% for x in some_data %}
+        {% if x.user_id == user.id or x.usuario == user.username %}
+          <span class="chip"><i class="fas fa-building"></i> {{ x.claveDepartamento }}</span>
+        {% endif %}
+      {% endfor %}
     </div>
   </div>
 {% endblock top_bar %}
