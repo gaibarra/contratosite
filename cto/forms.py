@@ -1,5 +1,7 @@
 from django import forms
 from django.forms import ModelForm
+from django.db.models import IntegerField
+from django.db.models.functions import Cast
 # from django.core.exceptions import ValidationError
 # import re
 
@@ -48,7 +50,8 @@ class PartesForm(ModelForm):
 
     claveDepartamento = forms.ModelChoiceField(
         queryset=Departamento.objects.filter(estado=True)
-        .order_by('claveDepartamento')
+        .annotate(clave_num=Cast('claveDepartamento', IntegerField()))
+        .order_by('clave_num', 'claveDepartamento')
     )
 
     domicilioParte = forms.CharField(
@@ -79,6 +82,12 @@ class PartesForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['claveDepartamento'].queryset = (
+            Departamento.objects.filter(estado=True)
+            .annotate(clave_num=Cast('claveDepartamento', IntegerField()))
+            .order_by('clave_num', 'claveDepartamento')
+        )
+        self.fields['clavePuesto'].queryset = Puestos.objects.order_by('nombrePuesto')
         for field in iter(self.fields):
             self.fields[field].widget.attrs.update({
                 'class': 'form-control'
@@ -156,6 +165,7 @@ class PartesForm2(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['clavePuesto'].queryset = Puestos.objects.order_by('nombrePuesto')
         for field in iter(self.fields):
             self.fields[field].widget.attrs.update({
                 'class': 'form-control'

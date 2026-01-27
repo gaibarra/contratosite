@@ -28,7 +28,7 @@ DEBUG = True
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
-ALLOWED_HOSTS = ['0.0.0.0','212.1.214.223','contratosmodelo.link','127.0.0.1']
+ALLOWED_HOSTS = ['0.0.0.0','194.113.64.91','contratosmodelo.site','127.0.0.1']
 
 
 # Application definition

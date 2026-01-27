@@ -51,6 +51,25 @@
 </style>
 
 <script>
+        // Ordenar opciones de claveDepartamento numéricamente en el cliente
+        (function(){
+            var sel = document.getElementById('id_claveDepartamento');
+            if (!sel || !sel.options || !sel.options.length) return;
+            var current = sel.value;
+            var opts = Array.prototype.slice.call(sel.options);
+            opts.sort(function(a, b){
+                var na = parseInt((a.text || '').trim().split(' ')[0], 10);
+                var nb = parseInt((b.text || '').trim().split(' ')[0], 10);
+                if (isNaN(na)) na = Number.MAX_SAFE_INTEGER;
+                if (isNaN(nb)) nb = Number.MAX_SAFE_INTEGER;
+                if (na !== nb) return na - nb;
+                return (a.text || '').localeCompare(b.text || '');
+            });
+            sel.innerHTML = '';
+            opts.forEach(function(o){ sel.appendChild(o); });
+            if (current) sel.value = current;
+        })();
+
         // Enviar el formulario por AJAX para mantener el foco en la captura del contrato
         (function(){
             var $form = $("form[role='form']");

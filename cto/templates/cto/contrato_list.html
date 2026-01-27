@@ -7,16 +7,26 @@
 
 {% block top_bar %}
   <div class="page-title-bar">
-    <div class="page-title"><i class="fas fa-file-contract"></i>
-      {% for x in some_data3 %}{% if x.marcatipoContrato %}{{ x.tipoContrato }}{% endif %}{% endfor %}
+    <div>
+      <div class="eyebrow text-muted">Panel de contratos</div>
+      <div class="page-title d-flex align-items-center" style="column-gap: 0.5rem;">
+        <i class="fas fa-file-contract"></i>
+        <span>
+          {% for x in some_data3 %}{% if x.marcatipoContrato %}{{ x.tipoContrato }}{% endif %}{% endfor %}
+        </span>
+      </div>
+      <div class="page-sub d-flex flex-wrap" style="gap: 0.35rem;">
+        <span class="chip"><i class="fas fa-user"></i> {{ user.username }} {{ user.last_name }} {{ user.first_name }}</span>
+        {% for x in some_data %}
+          {% if x.user_id == user.id or x.usuario == user.username %}
+            <span class="chip"><i class="fas fa-building"></i> {{ x.claveDepartamento }}</span>
+          {% endif %}
+        {% endfor %}
+        <span class="chip chip-muted"><i class="fas fa-list"></i> {{ obj|length }} contratos</span>
+      </div>
     </div>
-    <div class="page-sub">
-      <span class="chip"><i class="fas fa-user"></i> {{ user.username }} {{ user.last_name }} {{ user.first_name }}</span>
-      {% for x in some_data %}
-        {% if x.user_id == user.id or x.usuario == user.username %}
-          <span class="chip"><i class="fas fa-building"></i> {{ x.claveDepartamento }}</span>
-        {% endif %}
-      {% endfor %}
+    <div class="page-actions d-flex align-items-center" style="column-gap: 0.5rem;">
+      <a class="btn btn-primary" href="{% url 'cto:contrato_new' %}"><i class="fas fa-plus"></i> Nuevo contrato</a>
     </div>
   </div>
 {% endblock top_bar %}
@@ -26,85 +36,72 @@
 
 {% block page_content %}
 <div class="card shadow mb-4">
-  <!-- Card Header - Dropdown -->
   <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-
-    {% for item in obj %}
-
-    {% for x in some_data %}
-    {% if x.user_id == item.astep1 %}
-    <a class="btn btn-secondary" href="{% url 'cto:departamento_list' %}"><i cass="far fa-calendar-plus"></i>REV
-      {{x.usuario}}</a>
-    {% endif %}
-    {% endfor %}
-
-    {% endfor %}
-
-
-    <!-- <div class="dropdown no-arrow">
-      <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-      </a>
-      <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-        <div class="dropdown-header">Acciones:</div>
-        <a class="dropdown-item" onclick="return abrir_modal('{% url 'cto:departamento_list' %}')" href="#"><i class="far fa-calendar-plus"></i> Nuevo</a>
-      </div>
-    </div> -->
+    <div class="d-flex flex-wrap align-items-center" style="gap: 0.5rem;">
+      <span class="badge badge-light text-dark border"><i class="fas fa-filter"></i> Búsqueda y columnas visibles</span>
+      <span class="badge badge-light text-dark border"><i class="fas fa-table"></i> Exporta con el toolbar superior</span>
+    </div>
+    <a class="btn btn-outline-secondary btn-sm" href="{% url 'cto:departamento_list' %}"><i class="far fa-building"></i> Catálogo de departamentos</a>
   </div>
   <!-- Card Body -->
   <div class="card-body">
     {% if not obj %}
-    <div class="alert alert-info">No Hay Contratos</div>
+      <div class="alert alert-info d-flex align-items-center gap-2 mb-3"><i class="fas fa-info-circle"></i> No hay contratos registrados todavía.</div>
     {% endif %}
-    <div class="buttons-toolbar">
-      <a class="btn btn-danger" href="{% url 'cto:contrato_new' %}"><i cass="far fa-calendar-plus"></i>Nuevo
-        Contrato</a>
 
+    <div class="buttons-toolbar mb-3">
+      <a class="btn btn-primary" href="{% url 'cto:contrato_new' %}"><i class="fas fa-plus-circle"></i> Nuevo contrato</a>
     </div>
 
 
-    <table id="table" data-toggle="table" data-pagination="true" data-search="true" data-show-columns="true"
+    <table id="table" class="table" data-toggle="table" data-pagination="true" data-search="true" data-show-columns="true"
       data-show-toggle="true" data-show-fullscreen="true" data-toolbar=".buttons-toolbar" data-locale="es-MX">
-      <thead>
-        <th data-sortable="true" data-field="id">Folio&nbsp;&nbsp;</th>
-        <th data-sortable="true" data-field="tipocontrato">Tipo de Contrato</th>
-        <th data-sortable="true" data-field="status">Status&nbsp;&nbsp;</th>
-
-        <th data-sortable="true" data-field="datecontrato">Fecha</th>
-        <th data-sortable="true" data-field="parte2">Sujeto del contrato</th>
-        <th data-sortable="true" data-field="importeContrato">Importe</th>
-
-        <th class="all">Contrato</th>
-
-
-        <th class="all">Modificar</th>
-
+      <thead class="thead-light">
+        <tr>
+          <th data-sortable="true" data-field="id" class="text-nowrap">Folio</th>
+          <th data-sortable="true" data-field="tipocontrato" class="text-nowrap">Tipo de Contrato</th>
+          <th data-sortable="true" data-field="status" class="text-nowrap">Estado</th>
+          <th data-sortable="true" data-field="datecontrato" class="text-nowrap">Fecha</th>
+          <th data-sortable="true" data-field="parte2">Sujeto del contrato</th>
+          <th data-sortable="true" data-field="importeContrato" class="text-nowrap text-end">Importe</th>
+          <th class="all text-center">Contrato</th>
+          <th class="all text-center">Modificar</th>
+        </tr>
       </thead>
 
       <tbody>
         {% for item in obj %}
-
-
         <tr>
-          <td>{{ item.id}}</td>
-
-
-          <td>{{ item.tipocontrato }}</td>
-          <td>{{ item.status }}</td>
-          <td>{{ item.datecontrato|date:'d-M-Y' }}</td>
-          <td>{{ item.parte2 }}</td>
-          <td>{{ item.importeContrato.amount }}</td>
-          
+          <td class="text-nowrap font-weight-bold">{{ item.id }}</td>
+          <td class="text-nowrap">{{ item.tipocontrato }}</td>
           <td>
-            <a href="{% url 'cto:contrato_edit' item.id %}" class="href btn btn-success btn-circle">
+            {% if item.status == "CAP" %}
+              <span class="badge badge-warning text-dark">Captura</span>
+            {% elif item.status == "REV" %}
+              <span class="badge badge-info text-dark">Revisión</span>
+            {% elif item.status == "FIR" %}
+              <span class="badge badge-primary">Firma</span>
+            {% elif item.status == "AUT" %}
+              <span class="badge badge-success">Autorizado</span>
+            {% else %}
+              <span class="badge badge-secondary">{{ item.status }}</span>
+            {% endif %}
+          </td>
+          <td class="text-nowrap">{{ item.datecontrato|date:'d M Y' }}</td>
+          <td>{{ item.parte2 }}</td>
+          <td class="text-end">{{ item.importeContrato }}</td>
+          <td class="text-center">
+            <a href="{% url 'cto:contrato_edit' item.id %}" class="btn btn-outline-success btn-sm" title="Abrir contrato">
               <i class="far fa-edit"></i>
             </a>
           </td>
-          <td>
+          <td class="text-center">
             {% if item.status == "CAP" %}
-            <button class="btn btn-warning btn-circle" data-open-modal-url="{% url 'cto:contrato_edit2' item.id %}">
-              <i class="far fa-edit"></i>
-            </button>
+              <button class="btn btn-outline-warning btn-sm" data-open-modal-url="{% url 'cto:contrato_edit2' item.id %}" title="Editar en modal">
+                <i class="far fa-edit"></i>
+              </button>
+            {% else %}
+              <span class="text-muted small">--</span>
             {% endif %}
           </td>
         </tr>
