@@ -2131,7 +2131,11 @@ def coverletter_export(request, id):
     document.add_paragraph()
 
     # Add the text "Secuencia de un registro de Secuencia" after the page break
-    paragraph = document.add_paragraph("Aviso de Privacidad Integral del expediente de personal y registro de asistencia")
+    aviso_titulo = "Aviso de Privacidad Integral del expediente de personal y registro de asistencia"
+    if tipoc.id in (2, 3, 11):
+        aviso_titulo = "Aviso de Privacidad Integral de servicios profesionales independientes"
+
+    paragraph = document.add_paragraph(aviso_titulo)
     paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
     # Set the font to Arial and size to 11
@@ -2141,7 +2145,23 @@ def coverletter_export(request, id):
     run.bold = True
 
     # Add the remaining text
-    paragraph = document.add_paragraph("La empresa “ESCUELA MODELO S.C.P.”, con domicilio en calle 56 A no 444 x 29 A Col Centro, Mérida, Yucatán, con código postal 97000, es responsable del tratamiento de los datos personales, que nos proporcione toda persona que trabaje, colabore, preste sus servicios personales y/o servicios especializados para la empresa, los cuales serán protegidos conforme a lo dispuesto por la Ley Federal de Protección de Datos Personales en Posesión de los Particulares, y demás normatividad que resulte aplicable.")
+    aviso_intro = (
+        "La empresa “ESCUELA MODELO S.C.P.”, con domicilio en calle 56 A no 444 x 29 A Col Centro, Mérida, Yucatán, "
+        "con código postal 97000, es responsable del tratamiento de los datos personales, que nos proporcione toda "
+        "persona que trabaje, colabore, preste sus servicios personales y/o servicios especializados para la empresa, "
+        "los cuales serán protegidos conforme a lo dispuesto por la Ley Federal de Protección de Datos Personales en "
+        "Posesión de los Particulares, y demás normatividad que resulte aplicable."
+    )
+    if tipoc.id in (2, 3, 11):
+        aviso_intro = (
+            "La Institución Educativa “ESCUELA MODELO S.C.P.”, con domicilio en calle 56 A no 444 x 29 A Col Centro, "
+            "Mérida, Yucatán, con código postal 97000, es responsable del tratamiento de los datos personales, que nos "
+            "proporcione toda persona que trabaje, colabore, preste sus servicios personales y/o servicios especializados "
+            "para la empresa, los cuales serán protegidos conforme a lo dispuesto por la Ley Federal de Protección de "
+            "Datos Personales en Posesión de los Particulares, y demás normatividad que resulte aplicable."
+        )
+
+    paragraph = document.add_paragraph(aviso_intro)
     paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
 
     run = paragraph.runs[0]
@@ -2158,7 +2178,26 @@ def coverletter_export(request, id):
     run.font.size = Pt(11)
     run.bold = True
 
-    paragraph = document.add_paragraph("Los datos personales que recabamos de usted, persona que trabaje, colabore, preste sus servicios personales para la empresa, los utilizaremos para las siguientes finalidades: realizar los trámites de contratación, nombramiento e identificación de personal; administrar y dispersar la nómina; cumplir con las obligaciones patronales; otorgamiento de prestaciones y movimientos de personal, cumplimiento de obligaciones de transparencia comunes establecidos en la Ley Federal de Protección de Datos Personales en Posesión de los Particulares, transferencia a terceros en cumplimiento a atribuciones legales, registro de asistencia electrónica; así mismo se comunica que no se efectuarán tratamientos adicionales.")
+    finalidades_texto = (
+        "Los datos personales que recabamos de usted, persona que trabaje, colabore, preste sus servicios personales "
+        "para la empresa, los utilizaremos para las siguientes finalidades: realizar los trámites de contratación, "
+        "nombramiento e identificación de personal; administrar y dispersar la nómina; cumplir con las obligaciones "
+        "patronales; otorgamiento de prestaciones y movimientos de personal, cumplimiento de obligaciones de transparencia "
+        "comunes establecidos en la Ley Federal de Protección de Datos Personales en Posesión de los Particulares, "
+        "transferencia a terceros en cumplimiento a atribuciones legales, registro de asistencia electrónica; así mismo "
+        "se comunica que no se efectuarán tratamientos adicionales."
+    )
+    if tipoc.id in (2, 3, 11):
+        finalidades_texto = (
+            "Los datos personales que recabamos de usted, persona que, preste sus servicios personales para la empresa, "
+            "los utilizaremos para las siguientes finalidades: realizar los trámites de contratación, identificación del "
+            "servicio; administrar y dispersar pagos por cheque o transferencia; cumplimiento de obligaciones de "
+            "transparencia comunes establecidos en la Ley Federal de Protección de Datos Personales en Posesión de los "
+            "Particulares, transferencia a terceros en cumplimiento a atribuciones legales, registro de asistencia "
+            "electrónica; así mismo se comunica que no se efectuarán tratamientos adicionales."
+        )
+
+    paragraph = document.add_paragraph(finalidades_texto)
     paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
 
     run = paragraph.runs[0]
@@ -2202,6 +2241,21 @@ def coverletter_export(request, id):
                             "de Situación Fiscal, Descuentos por orden judicial, Créditos, Ingresos."),
     ("Datos biométricos", "Rostro, Huella dactilar.")
     ]
+    if tipoc.id in (2, 3, 11):
+        rows = [
+            ("Datos identificativos", "Nombre, Domicilio, Teléfono particular, Teléfono celular, Estado Civil, Firma, "
+                                      "Registro Federal de Contribuyentes, Código Postal para efectos fiscales, "
+                                      "Régimen de contribución en términos LISR, Clave Única de Registro de la Población, "
+                                      "Nombre de familiares, dependientes y beneficiarios, Fecha de nacimiento, Lugar de nacimiento, "
+                                      "Fotografías físicas, Edad."),
+            ("Datos electrónicos", "Correo electrónico, Fotografías en las instalaciones donde se preste el servicio, "
+                                   "Videograbaciones en las instalaciones donde se preste el servicio."),
+            ("Datos académicos", "Títulos, Certificados, Reconocimientos, Constancias, Diplomas, Cédula Profesional."),
+            ("Datos laborales", "Nombramiento, Referencias personales y laborales."),
+            ("Datos patrimoniales", "Seguros, Número de cuenta y/o Clave Bancaria Estandarizada, Información Fiscal/ "
+                                    "Constancia de Situación Fiscal, Descuentos por orden judicial, Ingresos."),
+            ("Datos biométricos", "Huella dactilar, Rostro")
+        ]
     
     for cell in header_cells:
         for paragraph in cell.paragraphs:
@@ -2288,6 +2342,17 @@ def coverletter_export(request, id):
         ("Autoridades jurisdiccionales estatales o federales", 
          "México", "Cumplimiento de mandamiento judicial fundado y motivado.")
     ]
+    if tipoc.id in (2, 3, 11):
+        transferencia_rows = [
+            ("Servicio de Administración Tributaria y Unidad de Inteligencia Financiera de la Secretaría de Hacienda y Crédito Público",
+             "México", "Pago de impuestos, actividades vulnerables, registros fiscales, controles volumétricos."),
+            ("Secretaría de Finanzas del Estado de Yucatán o Quintana Roo",
+             "México", "Trámites financieros e impuestos"),
+            ("BBVA México, S.A., Institución de Banca Múltiple, Grupo Financiero BBVA México y/o HSBC México, S.A., Institución de Banca Múltiple, Grupo Financiero HSBC",
+             "México", "Generación de cheques y Transferencias Electrónicas"),
+            ("Autoridades jurisdiccionales estatales o federales",
+             "México", "Cumplimiento de mandamiento judicial fundado y motivado.")
+        ]
 
     for destinatario, pais, finalidad in transferencia_rows:
         row_cells = transferencia_table.add_row().cells
@@ -2327,7 +2392,30 @@ def coverletter_export(request, id):
     run.font.size = Pt(11)
     run.bold = True
     
-    paragraph = document.add_paragraph("Con fundamento legal, en la fracción VI, Artículo 3 y Artículo 9 de la Ley Federal de Protección de Datos Personales en Posesión de los Particulares, la persona que trabaja, colabora, presta sus servicios personales para la empresa, señala que: SI / NO tiene datos personales que afecten a la esfera más íntima de su persona, o cuya utilización indebida pueda dar origen a discriminación, en términos de los artículos 2 y 3, de la Ley Federal del Trabajo, o conlleve un riesgo grave para éste. En particular, se consideran sensibles aquellos que puedan revelar aspectos como origen racial o étnico, estado de salud presente y futuro, información genética, creencias religiosas, filosóficas y morales, afiliación sindical, opiniones políticas, preferencia sexual, antecedentes penales. Estos datos, son de uso exclusivo e interno de la empresa, con base al Protocolo para prevenir la discriminación, así para dar cumplimiento a nuestra Política de prevención de riesgos psicosociales.  Por lo que SI / NO requisitará el ANEXO DATOS PERSONALES SENSIBLES, para declarar los posibles DATOS PERSONALES SENSIBLES.")
+    texto_sensibles = (
+        "Con fundamento legal, en la fracción VI, Artículo 3 y Artículo 9 de la Ley Federal de Protección de Datos Personales en "
+        "Posesión de los Particulares, la persona que trabaja, colabora, presta sus servicios personales para la empresa, señala que: "
+        "SI / NO tiene datos personales que afecten a la esfera más íntima de su persona, o cuya utilización indebida pueda dar origen "
+        "a discriminación, en términos de los artículos 2 y 3, de la Ley Federal del Trabajo, o conlleve un riesgo grave para éste. En "
+        "particular, se consideran sensibles aquellos que puedan revelar aspectos como origen racial o étnico, estado de salud presente "
+        "y futuro, información genética, creencias religiosas, filosóficas y morales, afiliación sindical, opiniones políticas, "
+        "preferencia sexual, antecedentes penales. Estos datos, son de uso exclusivo e interno de la empresa, con base al Protocolo para "
+        "prevenir la discriminación, así para dar cumplimiento a nuestra Política de prevención de riesgos psicosociales.  Por lo que "
+        "SI / NO requisitará el ANEXO DATOS PERSONALES SENSIBLES, para declarar los posibles DATOS PERSONALES SENSIBLES."
+    )
+    if tipoc.id in (2, 3, 11):
+        texto_sensibles = (
+            "Con fundamento legal, en la fracción VI, Artículo 3 y Artículo 9 de la Ley Federal de Protección de Datos Personales en "
+            "Posesión de los Particulares, la persona que trabaja, colabora, presta sus servicios personales para la empresa, señala que: "
+            "SI / NO tiene datos personales que afecten a la esfera más íntima de su persona, o cuya utilización indebida pueda dar origen "
+            "a discriminación, en términos de los artículos 2 y 3, de la Ley Federal del Trabajo, o conlleve un riesgo grave para éste. En "
+            "particular, se consideran sensibles aquellos que puedan revelar aspectos como origen racial o étnico, estado de salud presente "
+            "y futuro, información genética, creencias religiosas, filosóficas y morales, afiliación sindical, opiniones políticas, "
+            "preferencia sexual, antecedentes penales. Estos datos, son de uso exclusivo e interno de la empresa, con base al Protocolo para "
+            "prevenir la discriminación, así para dar cumplimiento a nuestra Política de prevención de riesgos psicosociales.  Por lo que "
+            "SI / NO requisitará el ANEXO DATOS PERSONALES SENSIBLES, para declarar los posibles DATOS PERSONALES SENSIBLES."
+        )
+    paragraph = document.add_paragraph(texto_sensibles)
     paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
 
     run = paragraph.runs[0]
@@ -2344,7 +2432,25 @@ def coverletter_export(request, id):
     run.font.size = Pt(11)
     run.bold = True
     
-    paragraph = document.add_paragraph("Usted, persona que trabaja, colabora, presta sus servicios personales para la empresa, tiene derecho a conocer qué datos personales tenemos de usted, para qué los utilizamos y las condiciones del uso que les damos (Acceso). Asimismo, es su derecho solicitar la corrección de su información personal en caso de que esté desactualizada, sea inexacta o incompleta (Rectificación); que la eliminemos de nuestros registros o bases de datos cuando considere que la misma no está siendo utilizada conforme a los principios, deberes y obligaciones previstas en la normativa (Cancelación); así como oponerse al uso de sus datos personales para fines específicos (Oposición). Estos derechos se conocen como derechos ARCO. " )
+    texto_arco = (
+        "Usted, persona que trabaja, colabora, presta sus servicios personales para la empresa, tiene derecho a conocer qué datos "
+        "personales tenemos de usted, para qué los utilizamos y las condiciones del uso que les damos (Acceso). Asimismo, es su derecho "
+        "solicitar la corrección de su información personal en caso de que esté desactualizada, sea inexacta o incompleta (Rectificación); "
+        "que la eliminemos de nuestros registros o bases de datos cuando considere que la misma no está siendo utilizada conforme a los "
+        "principios, deberes y obligaciones previstas en la normativa (Cancelación); así como oponerse al uso de sus datos personales para "
+        "fines específicos (Oposición). Estos derechos se conocen como derechos ARCO. "
+    )
+    if tipoc.id in (2, 3, 11):
+        texto_arco = (
+            "Usted, persona que trabaja, colabora, presta sus servicios personales para la empresa, tiene derecho a conocer qué datos "
+            "personales tenemos de usted, para qué los utilizamos y las condiciones del uso que les damos (Acceso). Asimismo, es su derecho "
+            "solicitar la corrección de su información personal en caso de que esté desactualizada, sea inexacta o incompleta (Rectificación); "
+            "que la eliminemos de nuestros registros o bases de datos cuando considere que la misma no está siendo utilizada conforme a los "
+            "principios, deberes y obligaciones previstas en la normativa (Cancelación); así como oponerse al uso de sus datos personales para "
+            "fines específicos (Oposición). Estos derechos se conocen como derechos ARCO. "
+        )
+
+    paragraph = document.add_paragraph(texto_arco)
     
     paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
 
@@ -2353,7 +2459,10 @@ def coverletter_export(request, id):
     run.font.size = Pt(10)
     run.bold = False
     
-    paragraph = document.add_paragraph("Para el ejercicio de cualquiera de los derechos ARCO, usted deberá presentar la solicitud POR ESCRITO respectiva en privacidadmodelo@modelo.edu.mx " )
+    texto_solicitud = "Para el ejercicio de cualquiera de los derechos ARCO, usted deberá presentar la solicitud POR ESCRITO respectiva en privacidadmodelo@modelo.edu.mx "
+    if tipoc.id in (2, 3, 11):
+        texto_solicitud = "Para el ejercicio de cualquiera de los derechos ARCO, usted deberá presentar la solicitud POR ESCRITO respectiva en gascor@modelo.edu.mx "
+    paragraph = document.add_paragraph(texto_solicitud)
     
     paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
 
@@ -2362,7 +2471,20 @@ def coverletter_export(request, id):
     run.font.size = Pt(10)
     run.bold = False
     
-    paragraph = document.add_paragraph("Para conocer el procedimiento y requisitos para el ejercicio de los derechos ARCO, usted podrá ponerse en contacto con nuestro Departamento de Privacidad, que dará trámite a las solicitudes para el ejercicio de estos derechos, y atenderá cualquier duda que pudiera tener respecto al tratamiento de su información. Los datos de contacto del Departamento de Privacidad son los siguientes privacidadmodelo@modelo.edu.mx" )
+    texto_contacto = (
+        "Para conocer el procedimiento y requisitos para el ejercicio de los derechos ARCO, usted podrá ponerse en contacto con nuestro "
+        "Departamento de Privacidad, que dará trámite a las solicitudes para el ejercicio de estos derechos, y atenderá cualquier duda que "
+        "pudiera tener respecto al tratamiento de su información. Los datos de contacto del Departamento de Privacidad son los siguientes "
+        "privacidadmodelo@modelo.edu.mx"
+    )
+    if tipoc.id in (2, 3, 11):
+        texto_contacto = (
+            "Para conocer el procedimiento y requisitos para el ejercicio de los derechos ARCO, usted podrá ponerse en contacto con nuestro "
+            "Departamento de Contabilidad, que dará trámite a las solicitudes para el ejercicio de estos derechos, y atenderá cualquier duda "
+            "que pudiera tener respecto al tratamiento de su información. Los datos de contacto del Departamento de Privacidad son los siguientes "
+            "gascor@modelo.edu.mx"
+        )
+    paragraph = document.add_paragraph(texto_contacto)
     
     paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
 
@@ -2405,7 +2527,10 @@ def coverletter_export(request, id):
 
     # Agregar "Nombre completo"
     paragraph = document.add_paragraph()
-    run = paragraph.add_run(partes.nombreParte)
+    nombre_firma = partes.nombreParte
+    if tipoc.id in (2, 3, 11):
+        nombre_firma = "Nombre Prestador de Servicios Profesionales"
+    run = paragraph.add_run(nombre_firma)
     run.font.name = 'Arial'
     run.font.size = Pt(11)
     run.bold = True
