@@ -502,11 +502,29 @@ class MisContratosDetalleView(SinPrivilegios, generic.DetailView):
 
     def get_queryset(self):
         queryset = Contratos.objects.select_related(
-            "parte2", "parte2__claveDepartamento", "tipocontrato"
+            "parte2", "parte2__claveDepartamento", "tipocontrato", "uc"
         ).prefetch_related("doctos_set__documento")
         if self.request.user.is_superuser:
             return queryset
         return queryset.filter(uc=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        contrato = context["contrato"]
+
+        def tiene_valor(valor):
+            return valor is not None and str(valor).strip().lower() not in ("", "none")
+
+        tipo_id = contrato.tipocontrato_id
+        context.update({
+            "mostrar_actividades": tiene_valor(contrato.actividadesContrato),
+            "mostrar_testigos": tiene_valor(contrato.testigoContrato1) or tiene_valor(contrato.testigoContrato2),
+            "mostrar_version": tiene_valor(contrato.versionContrato),
+            "mostrar_impuestos": tipo_id in (2, 3, 11),
+            "mostrar_societario": tipo_id == 11,
+            "mostrar_vehiculo": tipo_id == 13,
+        })
+        return context
 
 
 @login_required(login_url='/login/')
@@ -532,7 +550,8 @@ def contratos2(request, contrato_id=None):
             enCalidadDe1=tipocontratox.enCalidadDe1, enCalidadDe2=tipocontratox.enCalidadDe2,
             ciudadContrato="Mérida", estadoContrato="Yucatán", paisContrato="México",
             importeContrato=0, npContrato=1, imppContrato=0, vhppContrato=285,
-            status="CAP", rcap=request.user.id, current_user=request.user.id,
+            testigoContrato1="", testigoContrato2="", status="CAP",
+            rcap=request.user.id, current_user=request.user.id,
         )
         contexto = {
             "requi": Requisitos.objects.filter(estado=True), "fun": Partes.objects.none(),

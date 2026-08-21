@@ -89,6 +89,11 @@ class MisContratosViewTests(TestCase):
         self.assertContains(response, f">{self.own_contract.id}<", html=False)
         self.assertContains(response, f">{self.other_contract.id}<", html=False)
         self.assertEqual(detail_response.status_code, 200)
+        self.assertNotContains(detail_response, "Datos societarios")
+        self.assertNotContains(detail_response, "Vehículo")
+        self.assertNotContains(detail_response, "IVA y retenciones")
+        self.assertContains(detail_response, self.other_user.username)
+        self.assertNotContains(detail_response, "Pasos de autorización")
 
     def test_superuser_without_own_subject_can_open_global_contract_form(self):
         self.tipo.marcatipoContrato = True

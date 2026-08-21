@@ -27,36 +27,36 @@
       {{ fun2.rfc }}
         
         {% for x in fun2 %}
-            {% if x.user_id == enc.rstep1 %}
+            {% if enc.rstep1 and x.user_id == enc.rstep1 %}
               <a class="btn btn-success" href="#"><i cass="far fa-calendar-plus"></i>{{ enc.astep1 }} {{x.usuario}} <br> {{ enc.fstep1 |date:'d-M-y H:i'}}</a>
             {% endif %}                      
         {% endfor %} 
         
         {% for x in fun2 %}
-           {% if x.user_id == enc.rstep2 %}
+           {% if enc.rstep2 and x.user_id == enc.rstep2 %}
               <a class="btn btn-secondary" href="#"><i cass="far fa-calendar-plus"></i>{{ enc.astep2 }} {{x.usuario}} <br> {{ enc.fstep2 |date:'d-M-y H:i'}}</a>
            {% endif %}                      
         {% endfor %} 
 
         {% for x in fun2 %}
-           {% if x.user_id == enc.rstep3 %}
+           {% if enc.rstep3 and x.user_id == enc.rstep3 %}
               <a class="btn btn-warning" href="#"><i cass="far fa-calendar-plus"></i>{{ enc.astep3 }} {{x.usuario}} <br> {{ enc.fstep3 |date:'d-M-y H:i'}}</a>
            {% endif %}                      
         {% endfor %} 
 
         {% for x in fun2 %}
-           {% if x.user_id == enc.rstep4 %}
+           {% if enc.rstep4 and x.user_id == enc.rstep4 %}
               <a class="btn btn-info" href="#"><i cass="far fa-calendar-plus"></i>{{ enc.astep4 }} {{x.usuario}} <br> {{ enc.fstep4 |date:'d-M-y H:i'}}</a>
            {% endif %}                      
         {% endfor %} 
         
         {% for x in fun2 %}
-           {% if x.user_id == enc.rstep5 %}
+           {% if enc.rstep5 and x.user_id == enc.rstep5 %}
               <a class="btn btn-dark" href="#"><i cass="far fa-calendar-plus"></i>{{ enc.astep5 }} {{x.usuario}} <br> {{ enc.fstep5 |date:'d-M-y H:i'}}</a>
            {% endif %}                      
         {% endfor %} 
         {% for x in fun2 %}
-           {% if x.user_id == enc.rstep6 %}
+           {% if enc.rstep6 and x.user_id == enc.rstep6 %}
               <a class="btn btn-danger" href="#"><i cass="far fa-calendar-plus"></i>{{ enc.astep6 }} {{x.usuario}} <br>  {{ enc.fstep6 |date:'d-M-y H:i'}}</a>
            {% endif %}                      
         {% endfor %} 
@@ -557,7 +557,7 @@
                               {{ enc.testigoContrato1 }}                               
                             {% else %}
                               <div class="col-lg-8 form-group">
-                                  <input type="text"  name="enc_testigoContrato1" id="enc_testigoContrato1" class="form-control form-control-user  pl-0 text-left " value = "{{ enc.testigoContrato1 }}" required >
+                                  <input type="text"  name="enc_testigoContrato1" id="enc_testigoContrato1" class="form-control form-control-user  pl-0 text-left " value="{{ enc.testigoContrato1|default_if_none:'' }}" required>
                               </div>
                             {% endif %}
                     
@@ -570,7 +570,7 @@
                               {{ enc.testigoContrato2 }}
                             {% else %}
                               <div class="col-lg-8 form-group">
-                                  <input type="text"  name="enc_testigoContrato2" id="enc_testigoContrato2" class="form-control form-control-user  pl-0 text-left " value = "{{ enc.testigoContrato2 }}" required >
+                                  <input type="text"  name="enc_testigoContrato2" id="enc_testigoContrato2" class="form-control form-control-user  pl-0 text-left " value="{{ enc.testigoContrato2|default_if_none:'' }}" required>
                               </div>
                             {% endif %}
                     </div>
@@ -1205,9 +1205,9 @@
         $("#datecontrato_ini").val("{{ enc.datecontrato_ini|date:'Y-m-d' }}").change();
         $("#datecontrato_fin").val("{{ enc.datecontrato_fin|date:'Y-m-d' }}").change();
 
-        $("#enc_testigoContrato1").val("{{ enc.testigoContrato1 }}").change();
+        $("#enc_testigoContrato1").val("{{ enc.testigoContrato1|default_if_none:'' }}").change();
         
-        $("#enc_testigoContrato2").val("{{ enc.testigoContrato2 }}").change();
+        $("#enc_testigoContrato2").val("{{ enc.testigoContrato2|default_if_none:'' }}").change();
 
         $("#empresa").val("{{ enc.empresa }}").change();
         $("#tipo_sociedad").val("{{ enc.tipo_sociedad }}").change();
