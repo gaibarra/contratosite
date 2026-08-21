@@ -1,7 +1,7 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
 
-from bases.views import Home, HomeSinPrivilegios, healthz
+from bases.views import CambioContrasenaView, Home, HomeSinPrivilegios, healthz
 
 
 urlpatterns = [
@@ -11,7 +11,8 @@ urlpatterns = [
         name='login'),
     path('logout/',
          auth_views.LogoutView.as_view(template_name='bases/login.html'),
-         name='logout'),
+        name='logout'),
+    path('cambiar-contrasena/', CambioContrasenaView.as_view(), name='cambiar_contrasena'),
 
     path('sin_privilegios/',
          HomeSinPrivilegios.as_view(),

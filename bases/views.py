@@ -3,6 +3,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse_lazy
 
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.views import PasswordChangeView
+from django.contrib import messages
 from django.views import generic
 
 
@@ -26,6 +28,18 @@ class Home(LoginRequiredMixin, generic.TemplateView):
 class HomeSinPrivilegios(LoginRequiredMixin, generic.TemplateView):
     login_url = "bases:login"
     template_name="bases/sin_privilegios.html"
+
+
+class CambioContrasenaView(PasswordChangeView):
+    """Permite a cualquier usuario autenticado cambiar únicamente su contraseña."""
+
+    template_name = "bases/change_password.html"
+    success_url = reverse_lazy("bases:home")
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, "Tu contraseña se actualizó correctamente.")
+        return response
 
 
 def healthz(request):
