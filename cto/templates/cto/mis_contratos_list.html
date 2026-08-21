@@ -1,0 +1,79 @@
+{% extends 'base/base.html' %}
+
+{% block top_bar %}
+<div class="page-title-bar">
+  <div>
+    <div class="eyebrow text-muted">Consulta de contratos</div>
+    <div class="page-title"><i class="fas fa-search"></i> {% if user.is_superuser %}Todos los contratos{% else %}Mis contratos registrados{% endif %}</div>
+    <div class="page-sub">{% if user.is_superuser %}Consulta global de contratos registrados.{% else %}Consulta de los contratos que registraste.{% endif %}</div>
+  </div>
+</div>
+{% endblock top_bar %}
+
+{% block page_content %}
+<div class="card shadow mb-4">
+  <div class="card-body">
+    <form method="get" class="mb-4">
+      <div class="form-row align-items-end">
+        <div class="form-group col-md-4">
+          <label for="sujeto">Sujeto del contrato</label>
+          <input id="sujeto" name="sujeto" value="{{ request.GET.sujeto }}" class="form-control" placeholder="Nombre o razón social">
+        </div>
+        <div class="form-group col-md-2">
+          <label for="fecha_desde">Fecha desde</label>
+          <input id="fecha_desde" name="fecha_desde" type="date" value="{{ request.GET.fecha_desde }}" class="form-control">
+        </div>
+        <div class="form-group col-md-2">
+          <label for="fecha_hasta">Fecha hasta</label>
+          <input id="fecha_hasta" name="fecha_hasta" type="date" value="{{ request.GET.fecha_hasta }}" class="form-control">
+        </div>
+        <div class="form-group col-md-2">
+          <label for="tipo">Tipo</label>
+          <select id="tipo" name="tipo" class="form-control">
+            <option value="">Todos</option>
+            {% for tipo in tipos_contrato %}<option value="{{ tipo.id }}" {% if request.GET.tipo == tipo.id|stringformat:'s' %}selected{% endif %}>{{ tipo.tipoContrato }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="form-group col-md-2">
+          <label for="estado">Estado</label>
+          <select id="estado" name="estado" class="form-control">
+            <option value="">Todos</option>
+            {% for estado in estados %}<option value="{{ estado }}" {% if request.GET.estado == estado %}selected{% endif %}>{{ estado }}</option>{% endfor %}
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i> Buscar</button>
+      <a class="btn btn-outline-secondary" href="{% url 'cto:mis_contratos_list' %}">Limpiar</a>
+    </form>
+
+    {% if filtros_invalidos %}
+      <div class="alert alert-warning">La fecha inicial no puede ser posterior a la fecha final.</div>
+    {% endif %}
+
+    <p class="text-muted">{{ page_obj.paginator.count }} contrato{{ page_obj.paginator.count|pluralize:"s" }} encontrado{{ page_obj.paginator.count|pluralize:"s" }}.</p>
+    {% if obj %}
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead class="thead-light"><tr><th>Folio</th><th>Sujeto</th><th>Tipo</th><th>Estado</th><th>Fecha de emisión</th><th>Vigencia</th><th class="text-right">Importe</th><th></th></tr></thead>
+          <tbody>{% for contrato in obj %}
+            <tr>
+              <td class="font-weight-bold">{{ contrato.id }}</td><td>{{ contrato.parte2 }}</td><td>{{ contrato.tipocontrato }}</td><td>{{ contrato.status }}</td>
+              <td>{{ contrato.datecontrato|date:'d/m/Y'|default:'—' }}</td>
+              <td>{{ contrato.datecontrato_ini|date:'d/m/Y'|default:'—' }} — {{ contrato.datecontrato_fin|date:'d/m/Y'|default:'—' }}</td>
+              <td class="text-right">{{ contrato.importeContrato|default:'—' }}</td>
+              <td><a class="btn btn-outline-primary btn-sm" href="{% url 'cto:mis_contratos_detalle' contrato.id %}"><i class="fas fa-eye"></i> Ver detalle</a></td>
+            </tr>
+          {% endfor %}</tbody>
+        </table>
+      </div>
+      {% if is_paginated %}<nav aria-label="Paginación de contratos"><ul class="pagination justify-content-end">
+        {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?{% if filter_query %}{{ filter_query }}&amp;{% endif %}page={{ page_obj.previous_page_number }}">Anterior</a></li>{% endif %}
+        <li class="page-item disabled"><span class="page-link">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span></li>
+        {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?{% if filter_query %}{{ filter_query }}&amp;{% endif %}page={{ page_obj.next_page_number }}">Siguiente</a></li>{% endif %}
+      </ul></nav>{% endif %}
+    {% elif not filtros_invalidos %}
+      <div class="alert alert-info">No hay contratos que coincidan con la búsqueda.</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

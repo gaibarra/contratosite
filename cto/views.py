@@ -31,7 +31,7 @@ from docx.oxml.ns import nsdecls
 from docx.oxml import parse_xml
 
 
-from django.shortcuts import render, redirect, get_list_or_404
+from django.shortcuts import render, redirect, get_list_or_404, get_object_or_404
 from django.views import generic
 from django.views.generic import TemplateView, ListView, CreateView
 from django.contrib.messages.views import SuccessMessageMixin
@@ -42,6 +42,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseRedirect, HttpRequest, JsonResponse, HttpResponseServerError
 
 from datetime import datetime, date
+from django.utils.dateparse import parse_date
 from django.contrib import messages
 from django.db.models import Q
 from django.contrib.auth import authenticate
@@ -438,6 +439,74 @@ class ContratosView2(SinPrivilegios, generic.ListView):
         context['some_data2'] = Departamento.objects.all()
         context['some_data3'] = Tipocontrato.objects.filter(marcatipoContrato=True).order_by('-fm')  # Ordena los datos por la fecha de actualización
         return context
+
+
+class MisContratosView(SinPrivilegios, generic.ListView):
+    """Consulta de solo lectura de los contratos registrados por el usuario."""
+
+    model = Contratos
+    template_name = "cto/mis_contratos_list.html"
+    context_object_name = "obj"
+    permission_required = "cto.view_contratos"
+    paginate_by = 20
+
+    def contratos_visibles(self):
+        queryset = Contratos.objects.select_related("parte2", "tipocontrato")
+        if self.request.user.is_superuser:
+            return queryset
+        return queryset.filter(uc=self.request.user)
+
+    def get_queryset(self):
+        queryset = self.contratos_visibles()
+        sujeto = self.request.GET.get("sujeto", "").strip()
+        tipo = self.request.GET.get("tipo", "").strip()
+        estado = self.request.GET.get("estado", "").strip()
+        fecha_desde = parse_date(self.request.GET.get("fecha_desde", ""))
+        fecha_hasta = parse_date(self.request.GET.get("fecha_hasta", ""))
+
+        if sujeto:
+            queryset = queryset.filter(parte2__nombreParte__icontains=sujeto)
+        if tipo.isdigit():
+            queryset = queryset.filter(tipocontrato_id=tipo)
+        if estado:
+            queryset = queryset.filter(status=estado)
+        if fecha_desde:
+            queryset = queryset.filter(datecontrato__date__gte=fecha_desde)
+        if fecha_hasta:
+            queryset = queryset.filter(datecontrato__date__lte=fecha_hasta)
+        if fecha_desde and fecha_hasta and fecha_desde > fecha_hasta:
+            return queryset.none()
+
+        return queryset.order_by("-datecontrato", "-id")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        fecha_desde = parse_date(self.request.GET.get("fecha_desde", ""))
+        fecha_hasta = parse_date(self.request.GET.get("fecha_hasta", ""))
+        context["tipos_contrato"] = Tipocontrato.objects.filter(estado=True).order_by("tipoContrato")
+        context["estados"] = ("CAP", "REV", "FIR", "AUT")
+        context["filtros_invalidos"] = bool(fecha_desde and fecha_hasta and fecha_desde > fecha_hasta)
+        params = self.request.GET.copy()
+        params.pop("page", None)
+        context["filter_query"] = params.urlencode()
+        return context
+
+
+class MisContratosDetalleView(SinPrivilegios, generic.DetailView):
+    """Detalle inmutable y aislado por propietario, salvo para superusuarios."""
+
+    model = Contratos
+    template_name = "cto/mis_contratos_detalle.html"
+    context_object_name = "contrato"
+    permission_required = "cto.view_contratos"
+
+    def get_queryset(self):
+        queryset = Contratos.objects.select_related(
+            "parte2", "parte2__claveDepartamento", "tipocontrato"
+        ).prefetch_related("doctos_set__documento")
+        if self.request.user.is_superuser:
+            return queryset
+        return queryset.filter(uc=self.request.user)
 
 
 @login_required(login_url='/login/')

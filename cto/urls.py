@@ -45,6 +45,8 @@ urlpatterns = [
 
 
     path('contratos/', ContratosView.as_view(), name="contrato_list"),
+    path('mis-contratos/', MisContratosView.as_view(), name="mis_contratos_list"),
+    path('mis-contratos/<int:pk>/', MisContratosDetalleView.as_view(), name="mis_contratos_detalle"),
     path('contratos/new', contratos2, name="contrato_new"),
     
     path('contratos/edit/<int:contrato_id>', contratos2, name="contrato_edit"),
