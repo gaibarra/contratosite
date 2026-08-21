@@ -89,3 +89,13 @@ class MisContratosViewTests(TestCase):
         self.assertContains(response, f">{self.own_contract.id}<", html=False)
         self.assertContains(response, f">{self.other_contract.id}<", html=False)
         self.assertEqual(detail_response.status_code, 200)
+
+    def test_superuser_without_own_subject_can_open_global_contract_form(self):
+        self.tipo.marcatipoContrato = True
+        self.tipo.save()
+        self.client.force_login(self.admin_user)
+
+        response = self.client.get(reverse("cto:contrato_new"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.parte.nombreParte)

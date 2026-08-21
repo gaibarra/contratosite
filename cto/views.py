@@ -520,6 +520,30 @@ def contratos2(request, contrato_id=None):
     # print(xUsuario)
     #print (contrato_id)
 
+    # Un superusuario no necesita tener un sujeto propio: en el alta el
+    # departamento se determina por el sujeto que seleccione al guardar.
+    if request.user.is_superuser and not contrato_id and request.method == "GET":
+        tipocontratox = Tipocontrato.objects.filter(marcatipoContrato=True).first()
+        if not tipocontratox:
+            messages.error(request, 'No hay un tipo de contrato activo.')
+            return HttpResponseRedirect('/cto/contratos/')
+        encabezado = Contratos(
+            tipocontrato=tipocontratox, datecontrato=datetime.today(), parte1=164,
+            enCalidadDe1=tipocontratox.enCalidadDe1, enCalidadDe2=tipocontratox.enCalidadDe2,
+            ciudadContrato="Mérida", estadoContrato="Yucatán", paisContrato="México",
+            importeContrato=0, npContrato=1, imppContrato=0, vhppContrato=285,
+            status="CAP", rcap=request.user.id, current_user=request.user.id,
+        )
+        contexto = {
+            "requi": Requisitos.objects.filter(estado=True), "fun": Partes.objects.none(),
+            "fun2": Partes.objects.filter(estado=True).order_by('nombreParte'),
+            "fun3": Partes.objects.filter(estado=True).select_related('claveDepartamento').order_by('nombreParte'),
+            "enc": encabezado, "det": None, "departamentos": Departamento.objects.none(),
+            "funcionarios": Partes.objects.none(), "departamentos2": Departamento.objects.filter(estado=True),
+            "tipocont": tipocontratox,
+        }
+        return render(request, template_name, contexto)
+
     if contrato_id:
         contrato = Contratos.objects.filter(estado=True, id=contrato_id)
         c = contrato.first()
@@ -529,6 +553,19 @@ def contratos2(request, contrato_id=None):
         p = partes.first()
         #print (p)
         dx = p.claveDepartamento_id
+    elif request.user.is_superuser:
+        # En POST el sujeto seleccionado define el departamento, su secuencia
+        # administrativa y los testigos aplicables.
+        parte2_seleccionada = request.POST.get("enc_nombreParte")
+        sujeto_seleccionado = Partes.objects.filter(estado=True, pk=parte2_seleccionada).first()
+        if not sujeto_seleccionado:
+            messages.error(request, 'Seleccione un sujeto de contrato activo.')
+            return HttpResponseRedirect('/cto/contratos/new')
+        xUsuario = request.user.username
+        xUsuario2 = request.user.id
+        partes = Partes.objects.filter(pk=sujeto_seleccionado.pk)
+        p = sujeto_seleccionado
+        dx = sujeto_seleccionado.claveDepartamento_id
     else:
         xUsuario = (request.user.username)
         xUsuario2 = (request.user.id)
@@ -954,8 +991,11 @@ def contratos2(request, contrato_id=None):
         fun = Partes.objects.get(pk=a3)
         tip = Tipocontrato.objects.get(pk=tipocontrato)
 
-        if parte2:
-            suj = Partes.objects.get(pk=parte2)
+        sujetos_autorizados = Partes.objects.filter(estado=True) if request.user.is_superuser else partes3
+        suj = sujetos_autorizados.filter(pk=parte2).first()
+        if not suj:
+            messages.error(request, 'El sujeto seleccionado no está activo o no pertenece a un departamento autorizado.')
+            return HttpResponseRedirect('/cto/contratos/new')
 
         if not contrato_id:
             enc = Contratos(

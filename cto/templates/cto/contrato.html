@@ -122,7 +122,7 @@
                                     <select name="enc_nombreParte" id="enc_nombreParte" class="form-control" required>
                                         <option value="0">Seleccione el Sujeto del contrato</option>
                                         {% for item in fun3 %}
-                                            <option value="{{item.id}}">{{ item.nombreParte }} </option>
+                                            <option value="{{item.id}}">{{ item.nombreParte }} — {{ item.claveDepartamento }}</option>
                                         {% endfor %} 
                                      </select>
                                 </div>
