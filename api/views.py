@@ -3,6 +3,7 @@ from requests.api import put
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import status
 from django.shortcuts import get_object_or_404
 
 from api.serializer import ContratosSerializer, TipocontratoSerializer
@@ -31,15 +32,9 @@ class TipocontratoDetalle(APIView):
         return Response(data)
     
     def post(self,request, id):
-        cont = get_object_or_404(Tipocontrato,Q(id=id))
-        data = TipocontratoSerializer(cont).data
-        return Response(data)
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def put(self,request, id):
-        cont = get_object_or_404(Tipocontrato,Q(id=id))
-        data = TipocontratoSerializer(cont).data
-        data['martcatipoContrato'] = True
-        return Response(data)   
-    
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
     
     

@@ -1,7 +1,4 @@
-from .models import Tipocontrato
-from django.db import transaction, IntegrityError
 from django.http import HttpRequest
-import json
 
 
 class CtoMiddleware:
@@ -34,61 +31,7 @@ class CtoMiddleware:
     #                     tipo.save()
 
     def process_request(self, request: HttpRequest):
-        url = request.META.get("PATH_INFO", "")
-        # Solo actuar en rutas de API POST/PUT/PATCH donde esperamos un id en el body
-        if not url or "api" not in url or request.method not in {"POST", "PUT", "PATCH"}:
-            return None
-
-        # Intentar extraer "id" del body (JSON o texto simple) o de la URL /.../<id>
-        xid = None
-        try:
-            if request.body:
-                # Primero intenta JSON {"id": 123}
-                data = json.loads(request.body.decode("utf-8"))
-                if isinstance(data, dict) and "id" in data:
-                    xid = data["id"]
-                elif isinstance(data, (str, int)):
-                    xid = data
-        except Exception:
-            # Si no es JSON válido, considerar todo el body como el id en texto
-            try:
-                xid = request.body.decode("utf-8").strip()
-            except Exception:
-                xid = None
-
-        if not xid:
-            # Fallback: intentar extraer el último segmento numérico de la URL
-            try:
-                parts = [p for p in url.split('/') if p]
-                if parts:
-                    candidate = parts[-1]
-                    if candidate.isdigit():
-                        xid = int(candidate)
-            except Exception:
-                pass
-        if not xid:
-            return None
-
-        # Operación atómica y con protección ante condición de carrera
-        try:
-            with transaction.atomic():
-                # Bloquear los actualmente activos para evitar carreras
-                list(
-                    Tipocontrato.objects.select_for_update()
-                    .filter(estado=True, marcatipoContrato=True)
-                )
-                # Apagar los activos actuales
-                Tipocontrato.objects.filter(estado=True, marcatipoContrato=True).update(
-                    marcatipoContrato=False
-                )
-                # Bloquear y encender el solicitado
-                list(
-                    Tipocontrato.objects.select_for_update().filter(estado=True, id=xid)
-                )
-                Tipocontrato.objects.filter(estado=True, id=xid).update(marcatipoContrato=True)
-        except IntegrityError:
-            # Si la constraint de unicidad se dispara por carrera, reintentar una vez limpiando y marcando
-            with transaction.atomic():
-                Tipocontrato.objects.filter(estado=True).update(marcatipoContrato=False)
-                Tipocontrato.objects.filter(estado=True, id=xid).update(marcatipoContrato=True)
+        # La selección del tipo es local a cada URL de alta/lista. Este
+        # middleware permanece como compatibilidad, pero ya no escribe estado
+        # global compartido entre usuarios o pestañas.
         return None

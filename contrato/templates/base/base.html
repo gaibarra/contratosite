@@ -208,11 +208,11 @@
              </button>
              <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
                 
-               <a class="dropdown-item" id="10" href="{% url 'cto:contrato_list' %}">SUELDOS de DOCENTES con RECONOCIMIENTO DE ANTIGÜEDAD por TIEMPO INDETERMINADO y con PRESTACIONES BÁSICAS DE LFT</a>
+               <a class="dropdown-item" href="{% url 'cto:contrato_list_tipo' 10 %}">SUELDOS de DOCENTES con RECONOCIMIENTO DE ANTIGÜEDAD por TIEMPO INDETERMINADO y con PRESTACIONES BÁSICAS DE LFT</a>
                <!-- <a class="dropdown-item" id="9" href="{% url 'cto:contrato_list' %}">SUELDOS de DOCENTES por TIEMPO DETERMINADO y con PRESTACIONES BÁSICAS DE LFT</a> -->
-                 <a class="dropdown-item" id="8" href="{% url 'cto:contrato_list' %}">SUELDOS de DOCENTES por TIEMPO INDETERMINADO con PRESTACIONES BÁSICAS DE LFT </a>
-                 <a class="dropdown-item" id="7" href="{% url 'cto:contrato_list' %}">CONTRATO INDIVIDUAL DE TRABAJO POR TIEMPO DETERMINADO POR SUPLENCIA </a>
-                 <a class="dropdown-item" id="15" href="{% url 'cto:contrato_list' %}">CONTRATO INDIVIDUAL DE TRABAJO POR TIEMPO DETERMINADO PERÍODO DE PRUEBA </a>
+                 <a class="dropdown-item" href="{% url 'cto:contrato_list_tipo' 8 %}">SUELDOS de DOCENTES por TIEMPO INDETERMINADO con PRESTACIONES BÁSICAS DE LFT </a>
+                 <a class="dropdown-item" href="{% url 'cto:contrato_list_tipo' 7 %}">CONTRATO INDIVIDUAL DE TRABAJO POR TIEMPO DETERMINADO POR SUPLENCIA </a>
+                 <a class="dropdown-item" href="{% url 'cto:contrato_list_tipo' 15 %}">CONTRATO INDIVIDUAL DE TRABAJO POR TIEMPO DETERMINADO PERÍODO DE PRUEBA </a>
              </div>
            </div>
             
@@ -230,10 +230,10 @@
                Sueldos Administración
              </button>
              <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
-               <a class="dropdown-item" id="14" href="{% url 'cto:contrato_list' %}">SUELDOS de ADMINISTRACIÓN con RECONOCIMIENTO DE ANTIGÜEDAD, por TIEMPO INDETERMINADO y con PRESTACIONES BÁSICAS DE LFT</a>
-               <a class="dropdown-item" id="5" href="{% url 'cto:contrato_list' %}">SUELDOS de ADMINISTRACIÓN por TIEMPO INDETERMINADO y con PRESTACIONES BÁSICAS DE LFT <span class="blinking" style="color: green; font-weight: bold;">*** NUEVO INGRESO ***</span></a>
-               <a class="dropdown-item" id="6" href="{% url 'cto:contrato_list' %}">SUELDOS de ADMINISTRACIÓN por TIEMPO DETERMINADO POR SUPLENCIA</a>
-               <a class="dropdown-item" id="16" href="{% url 'cto:contrato_list' %}">SUELDOS de ADMINISTRACIÓN por TIEMPO DETERMINADO PERÍODO DE PRUEBA</a>
+               <a class="dropdown-item" href="{% url 'cto:contrato_list_tipo' 14 %}">SUELDOS de ADMINISTRACIÓN con RECONOCIMIENTO DE ANTIGÜEDAD, por TIEMPO INDETERMINADO y con PRESTACIONES BÁSICAS DE LFT</a>
+               <a class="dropdown-item" href="{% url 'cto:contrato_list_tipo' 5 %}">SUELDOS de ADMINISTRACIÓN por TIEMPO INDETERMINADO y con PRESTACIONES BÁSICAS DE LFT <span class="blinking" style="color: green; font-weight: bold;">*** NUEVO INGRESO ***</span></a>
+               <a class="dropdown-item" href="{% url 'cto:contrato_list_tipo' 6 %}">SUELDOS de ADMINISTRACIÓN por TIEMPO DETERMINADO POR SUPLENCIA</a>
+               <a class="dropdown-item" href="{% url 'cto:contrato_list_tipo' 16 %}">SUELDOS de ADMINISTRACIÓN por TIEMPO DETERMINADO PERÍODO DE PRUEBA</a>
                
                {% comment %} <a class="dropdown-item" id="4" href="{% url 'cto:contrato_list' %}">SUELDOS de ADMINISTRACIÓN con RECONOCIMIENTO DE ANTIGÜEDAD, por TIEMPO INDETERMINADO y con PRESTACIONES MODELO</a> {% endcomment %}
              </div>
@@ -252,8 +252,8 @@
     					Honorarios
   				</button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenu1" >
-                    <a class="dropdown-item" id="2" href="{% url 'cto:contrato_list' %}">HONORARIOS por SERVICIOS DENTALES</a>
-                    <a class="dropdown-item" id="3" href="{% url 'cto:contrato_list' %}">HONORARIOS por SERVICIOS DOCENTES</a>
+                    <a class="dropdown-item" href="{% url 'cto:contrato_list_tipo' 2 %}">HONORARIOS por SERVICIOS DENTALES</a>
+                    <a class="dropdown-item" href="{% url 'cto:contrato_list_tipo' 3 %}">HONORARIOS por SERVICIOS DOCENTES</a>
                 </div>
             
             
@@ -272,9 +272,9 @@
   				</button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenu1" >
                     
-                    <a class="dropdown-item" id="1" href="{% url 'cto:contrato_list' %}">CONTRATO DE HONORARIOS ASIMILADOS A SALARIOS</a>
-                    <a class="dropdown-item" id="11" href="{% url 'cto:contrato_list' %}">CONTRATO DE PRESTACIÓN DE SERVICIOS PROFESIONALES EDUCATIVOS<span class="blinking" style="color: green; font-weight: bold;">*** EMPRESAS ***</span> </a>
-                    <a class="dropdown-item" id="13" href="{% url 'cto:contrato_list' %}">CONTRATO DE COMODATO DE VEHÍCULO</a>
+                    <a class="dropdown-item" href="{% url 'cto:contrato_list_tipo' 1 %}">CONTRATO DE HONORARIOS ASIMILADOS A SALARIOS</a>
+                    <a class="dropdown-item" href="{% url 'cto:contrato_list_tipo' 11 %}">CONTRATO DE PRESTACIÓN DE SERVICIOS PROFESIONALES EDUCATIVOS<span class="blinking" style="color: green; font-weight: bold;">*** EMPRESAS ***</span> </a>
+                    <a class="dropdown-item" href="{% url 'cto:contrato_list_tipo' 13 %}">CONTRATO DE COMODATO DE VEHÍCULO</a>
                               
                 </div>
             </div>
@@ -899,7 +899,8 @@
 
   </script>
   {% endblock%}
-  
+  {% comment %} Selección global heredada: los enlaces ahora usan rutas explícitas. {% endcomment %}
+  {% comment %}
 <script type="text/javascript">
   $(document).ready(function(){
     $("#7").click(function(){
@@ -1363,6 +1364,7 @@
 
 
 
+{% endcomment %}
  <script>
     setTimeout(function(){
       if ($('#msg').length > 0) {

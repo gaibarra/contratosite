@@ -209,7 +209,7 @@ class ContratosForm(forms.ModelForm):
 
     class Meta:
         model = Contratos
-        fields = ['id', 'tipocontrato',  'parte2', 'datecontrato', 'datecontrato_ini', 'datecontrato_fin', 'importeContrato',  'npContrato', 'imppContrato', 'totalhorasContrato',
+        fields = ['id', 'parte2', 'datecontrato', 'datecontrato_ini', 'datecontrato_fin', 'importeContrato',  'npContrato', 'imppContrato', 'totalhorasContrato',
                   'testigoContrato1',  'testigoContrato2', 'empresa', 'rfc_sociedad', 'tipo_sociedad', 'testimonio', 'domicilio_sociedad', 'clausula','objeto_social'  ]
         exclude = ['um', 'fm', 'uc', 'fc']
         
@@ -243,8 +243,6 @@ class ContratosForm(forms.ModelForm):
                 'class': 'form-control'
             })
 
-        self.fields['tipocontrato'].widget.attrs['style'] = "width:750px"
-        
         self.fields['parte2'].widget.attrs['style'] = "width:450px"
         self.fields['datecontrato_ini'].widget.attrs['style'] = "width:200px"
         self.fields['datecontrato_fin'].widget.attrs['style'] = "width:200px"

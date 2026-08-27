@@ -357,88 +357,29 @@ class ContratosView(SinPrivilegios, generic.ListView):
     permission_required = "cto.view_contratos"
 
     def get_queryset(self):
-        xtipo = 0
-        tipocontrato = Tipocontrato.objects.filter(marcatipoContrato=True)
-        for x in tipocontrato:
-            if x.marcatipoContrato == True:
-                xtipo = x.id
-                # print(xtipo)
-        # r = requests.get('http://127.0.0.1:8000/api/v1/tipocontrato/7')
-        # print (r.content)
-        # print (r.status_code)
-        # print (r.headers)
-        # print (r.json)
-        # x=urllib.request.urlretrieve('http://127.0.0.1:8000/api/v1/tipocontrato/7')
-        # print(x)8
-
-        current_userx = self.request.user.id
-        #conditions = dict(current_user=current_userx, uc_id=self.request.user)
-        #queryset = queryset.filter(**conditions)
-        # return Contratos.objects.all()
-
-        return Contratos.objects.filter(
-            (Q(current_user=current_userx) | Q(uc_id=self.request.user)), Q(
-                tipocontrato_id=xtipo)
-        )
-        # return SpyorEnc.objects.filter(
-        #    Q(current_user=current_userx) | Q(uc_id=self.request.user) | Q(el_jefe=current_userx)
-        # )
+        queryset = Contratos.objects.select_related("tipocontrato", "parte2")
+        if not self.request.user.is_superuser:
+            queryset = queryset.filter(Q(current_user=self.request.user.id) | Q(uc_id=self.request.user))
+        tipo_id = self.kwargs.get("tipo_id")
+        if tipo_id is not None:
+            get_object_or_404(Tipocontrato, estado=True, pk=tipo_id)
+            queryset = queryset.filter(tipocontrato_id=tipo_id, tipocontrato__estado=True)
+        return queryset.order_by("-datecontrato", "-id")
 
     def get_context_data(self, **kwargs):
 
         # Call the base implementation first to get a context
         context = super(ContratosView, self).get_context_data(**kwargs)
-        # Get the blog from id and add it to the context
+        tipo_id = self.kwargs.get("tipo_id")
+        context["tipo_actual"] = Tipocontrato.objects.filter(estado=True, pk=tipo_id).first() if tipo_id else None
         context['some_data'] = Partes.objects.all()
         context['some_data2'] = Departamento.objects.all()
-        context['some_data3'] = Tipocontrato.objects.filter(marcatipoContrato=True).order_by('-fm')  # Ordena los datos por la fecha de actualización
+        context['some_data3'] = [context["tipo_actual"]] if context["tipo_actual"] else []
         return context
 
 
-class ContratosView2(SinPrivilegios, generic.ListView):
-    model = Contratos
-    template_name = "cto/contrato_list.html"
-    context_object_name = "obj"
-    success_url = reverse_lazy("cto:contrato_list")
-    permission_required = "cto.view_contratos"
-
-    def get_queryset(self):
-        xtipo = 0
-        tipocontrato = Tipocontrato.objects.filter(marcatipoContrato=True)
-        for x in tipocontrato:
-            if x.marcatipoContrato == True:
-                xtipo = x.id
-                # print(xtipo)
-        # r = requests.get('http://127.0.0.1:8000/api/v1/tipocontrato/7')
-        # print (r.content)
-        # print (r.status_code)
-        # print (r.headers)
-        # print (r.json)
-        # x=urllib.request.urlretrieve('http://127.0.0.1:8000/api/v1/tipocontrato/7')
-        # print(x)8
-
-        current_userx = self.request.user.id
-        #conditions = dict(current_user=current_userx, uc_id=self.request.user)
-        #queryset = queryset.filter(**conditions)
-        # return Contratos.objects.all()
-
-        return Contratos.objects.filter(
-            (Q(current_user=current_userx) | Q(uc_id=self.request.user)), Q(
-                tipocontrato_id=xtipo)
-        )
-        # return SpyorEnc.objects.filter(
-        #    Q(current_user=current_userx) | Q(uc_id=self.request.user) | Q(el_jefe=current_userx)
-        # )
-
-    def get_context_data(self, **kwargs):
-
-        # Call the base implementation first to get a context
-        context = super(ContratosView, self).get_context_data(**kwargs)
-        # Get the blog from id and add it to the context
-        context['some_data'] = Partes.objects.all()
-        context['some_data2'] = Departamento.objects.all()
-        context['some_data3'] = Tipocontrato.objects.filter(marcatipoContrato=True).order_by('-fm')  # Ordena los datos por la fecha de actualización
-        return context
+class ContratosView2(ContratosView):
+    """Alias heredado sin estado global para cualquier referencia histórica."""
 
 
 class MisContratosView(SinPrivilegios, generic.ListView):
@@ -529,7 +470,7 @@ class MisContratosDetalleView(SinPrivilegios, generic.DetailView):
 
 @login_required(login_url='/login/')
 @permission_required('cto.add_contratos', login_url='bases:sin_privilegios')
-def contratos2(request, contrato_id=None):
+def contratos2(request, contrato_id=None, tipo_id=None):
 
     template_name = 'cto/contrato.html'
     detalle = {}
@@ -538,13 +479,17 @@ def contratos2(request, contrato_id=None):
     # print(xUsuario)
     #print (contrato_id)
 
+    tipo_nuevo = None
+    if not contrato_id:
+        if tipo_id is None:
+            messages.error(request, 'Seleccione un tipo de contrato antes de iniciar la captura.')
+            return HttpResponseRedirect('/cto/contratos/')
+        tipo_nuevo = get_object_or_404(Tipocontrato, estado=True, pk=tipo_id)
+
     # Un superusuario no necesita tener un sujeto propio: en el alta el
     # departamento se determina por el sujeto que seleccione al guardar.
     if request.user.is_superuser and not contrato_id and request.method == "GET":
-        tipocontratox = Tipocontrato.objects.filter(marcatipoContrato=True).first()
-        if not tipocontratox:
-            messages.error(request, 'No hay un tipo de contrato activo.')
-            return HttpResponseRedirect('/cto/contratos/')
+        tipocontratox = tipo_nuevo
         encabezado = Contratos(
             tipocontrato=tipocontratox, datecontrato=datetime.today(), parte1=164,
             enCalidadDe1=tipocontratox.enCalidadDe1, enCalidadDe2=tipocontratox.enCalidadDe2,
@@ -751,8 +696,7 @@ def contratos2(request, contrato_id=None):
 
     if request.method == "GET":
         enc = Contratos.objects.filter(pk=contrato_id).first()
-        tipocontratox = Tipocontrato.objects.filter(marcatipoContrato=True)
-        tipocontratox = tipocontratox.first()
+        tipocontratox = enc.tipocontrato if enc else tipo_nuevo
 
         tipocontrato = tipocontratox.id
         if not enc:
@@ -938,8 +882,7 @@ def contratos2(request, contrato_id=None):
 
     if request.method == "POST":
 
-        tipocontratox = Tipocontrato.objects.filter(marcatipoContrato=True)
-        tipocontratox = tipocontratox.first()
+        tipocontratox = Contratos.objects.only('tipocontrato').get(pk=contrato_id).tipocontrato if contrato_id else tipo_nuevo
 
         tipocontrato = tipocontratox.id
         # print(tipocontrato)
@@ -3152,21 +3095,7 @@ def contratoGracont(request, id):
 @login_required(login_url="/login/")
 @permission_required("cto.change_contratos", login_url="/login/")
 def marcaContrato(request, id):
-    tipocontratos = Tipocontrato.objects.filter(pk=id).first()
-
-    if request.is_ajax and request.method == "POST":
-
-        data = json.loads(request.body)
-        # print(data)
-
-        if Tipocontrato.tipoContrato:
-            Tipocontrato.marcatipoContrato = True
-            Tipocontrato.save()
-            return HttpResponse("OK")
-
-        return HttpResponse("FAIL")
-
-    return HttpResponse("FAIL")
+    return HttpResponse(status=405)
 
 
 def calcular_edad_anos(fecha_nacimiento):

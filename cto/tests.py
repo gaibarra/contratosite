@@ -64,6 +64,36 @@ class MisContratosViewTests(TestCase):
         self.assertContains(response, f">{self.own_contract.id}<", html=False)
         self.assertNotContains(response, f">{self.other_contract.id}<", html=False)
 
+    def test_contract_type_list_is_selected_by_url_not_global_marker(self):
+        other_type = Tipocontrato(
+            tipoContrato="Otro tipo", tituloContrato="Título", textoinicialContrato="Texto", marcatipoContrato=True,
+            uc=self.owner,
+        )
+        other_type.save()
+        self.client.force_login(self.owner)
+
+        response = self.client.get(reverse("cto:contrato_list_tipo", args=[self.tipo.id]))
+
+        self.assertContains(response, f">{self.own_contract.id}<", html=False)
+        self.assertNotContains(response, other_type.tipoContrato)
+
+    def test_legacy_type_endpoint_is_read_only(self):
+        self.tipo.marcatipoContrato = True
+        self.tipo.save()
+
+        response = self.client.post(reverse("api:tipocontrato_detalle", args=[self.tipo.id]), {})
+
+        self.assertEqual(response.status_code, 405)
+        self.tipo.refresh_from_db()
+        self.assertTrue(self.tipo.marcatipoContrato)
+
+    def test_new_contract_without_explicit_type_is_rejected(self):
+        self.client.force_login(self.admin_user)
+
+        response = self.client.get(reverse("cto:contrato_new"))
+
+        self.assertRedirects(response, reverse("cto:contrato_list"))
+
     def test_filters_contracts_by_subject_date_type_and_status(self):
         self.client.force_login(self.owner)
         response = self.client.get(reverse("cto:mis_contratos_list"), {
@@ -100,7 +130,7 @@ class MisContratosViewTests(TestCase):
         self.tipo.save()
         self.client.force_login(self.admin_user)
 
-        response = self.client.get(reverse("cto:contrato_new"))
+        response = self.client.get(reverse("cto:contrato_new_tipo", args=[self.tipo.id]))
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.parte.nombreParte)

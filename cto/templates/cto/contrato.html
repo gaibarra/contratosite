@@ -18,7 +18,7 @@
 
 {% block page_content %}
 
-<form method="post" enctype="multipart/form-data" id="frmSolicitudes"  >
+<form method="post" enctype="multipart/form-data" id="frmSolicitudes"{% if not enc.id %} action="{% url 'cto:contrato_new_tipo' tipocont.id %}"{% endif %}>
     {% csrf_token %}    
 
 
